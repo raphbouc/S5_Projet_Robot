@@ -150,6 +150,7 @@ def test(chn=0):
 	front_wheels = Front_Wheels(channel=chn)
 	try:
 		while True:
+			print("Test Test")
 			print("turn_left")
 			front_wheels.turn_left()
 			time.sleep(1)
