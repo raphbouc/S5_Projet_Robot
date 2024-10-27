@@ -7,19 +7,19 @@ GPIO.setmode(GPIO.BCM)
 GPIO.setup(SIG_PIN, GPIO.OUT)
 
 def get_distance():
-    # Generer une impulsion de 20 µs pour déclencher la mesure
+    # Generer une impulsion de 20 µs pour declencher la mesure
     GPIO.output(SIG_PIN, GPIO.HIGH)
     time.sleep(0.00002)  # 20 microsecondes
     GPIO.output(SIG_PIN, GPIO.LOW)
 
-    # Mettre le pin en mode input pour lire la durée de l'écho
+    # Mettre le pin en mode input pour lire la duree de l'echo
     GPIO.setup(SIG_PIN, GPIO.IN)
 
-    # Lire le temps de la durée de l'impulsion
+    # Lire le temps de la duree de l'impulsion
     rx_time = GPIO.wait_for_edge(SIG_PIN, GPIO.FALLING, timeout=100) # Temps maximum d'attente 100 ms
     
     if rx_time is None:
-        return 0  # Pas de réponse dans le delai imparti
+        return 0  # Pas de reponse dans le delai imparti
 
     distance = rx_time * 34 / 2000.0  # Convertir le temps en distance (en cm)
 
