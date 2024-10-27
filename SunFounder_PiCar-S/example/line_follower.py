@@ -20,8 +20,8 @@ import picar
 picar.setup()
 
 REFERENCES = [200, 200, 200, 200, 200]
-#calibrate = True
-calibrate = False
+calibrate = True
+#calibrate = False
 forward_speed = 10
 backward_speed = 10
 turning_angle = 40
