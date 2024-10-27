@@ -9,7 +9,7 @@ def get_distance():
     # Set SIG_PIN as output to send a pulse
     GPIO.setup(SIG_PIN, GPIO.OUT)
     
-    # Generate a 20 µs pulse to trigger the measurement
+    # Generate a 20 us pulse to trigger the measurement
     GPIO.output(SIG_PIN, GPIO.HIGH)
     time.sleep(0.00002)  # 20 microseconds
     GPIO.output(SIG_PIN, GPIO.LOW)
