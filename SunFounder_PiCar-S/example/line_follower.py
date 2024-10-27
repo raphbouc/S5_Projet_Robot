@@ -61,7 +61,7 @@ def main():
 	bw.forward()
 	while True:
 		lt_status_now = lf.read_digital()
-		#print(lt_status_now)
+		print(lt_status_now)
 		# Angle calculate
 		if	lt_status_now == [0,0,1,0,0]:
 			step = 0	
