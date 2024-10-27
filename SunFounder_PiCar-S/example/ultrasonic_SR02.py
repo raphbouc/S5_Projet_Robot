@@ -7,7 +7,7 @@ GPIO.setmode(GPIO.BCM)
 GPIO.setup(SIG_PIN, GPIO.OUT)
 
 def get_distance():
-    # Generer une impulsion de 20 µs pour declencher la mesure
+    # Generer une impulsion de 20 us pour declencher la mesure
     GPIO.output(SIG_PIN, GPIO.HIGH)
     time.sleep(0.00002)  # 20 microsecondes
     GPIO.output(SIG_PIN, GPIO.LOW)
