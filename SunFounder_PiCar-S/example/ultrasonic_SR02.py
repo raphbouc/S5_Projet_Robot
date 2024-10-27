@@ -1,57 +1,44 @@
-import RPi.GPIO as GPIO
 import time
+import RPi.GPIO as GPIO
 
-# Define the pin for the signal
-SIG_PIN = 20  # Change this pin according to your setup
-
-def setup():
-    GPIO.setmode(GPIO.BCM)
-    GPIO.setwarnings(False)
-    GPIO.setup(SIG_PIN, GPIO.OUT)
-    print("Setup complete.")
+SIG_PIN = 20  # Using GPIO 38 for the sensor signal
+GPIO.setmode(GPIO.BCM)
+GPIO.setwarnings(False)  # Disable warnings about already-used channels
 
 def get_distance():
-    # Trigger the signal
+    # Set SIG_PIN as output to send a pulse
+    GPIO.setup(SIG_PIN, GPIO.OUT)
+    
+    # Generate a 20 us pulse to trigger the measurement
     GPIO.output(SIG_PIN, GPIO.HIGH)
-    time.sleep(0.00002)  # 20 us
+    time.sleep(0.00002)  # 20 microseconds
     GPIO.output(SIG_PIN, GPIO.LOW)
-    
-    # Measure the return time
-    GPIO.setup(SIG_PIN, GPIO.IN)
-    
-    pulse_start = time.time()
-    pulse_end = time.time()
-    
-    # Wait for the signal to go HIGH to start timing
-    while GPIO.input(SIG_PIN) == 0:
-        pulse_start = time.time()
-    
-    # Wait for the signal to go LOW to end timing
-    while GPIO.input(SIG_PIN) == 1:
-        pulse_end = time.time()
-    
-    # Calculate the time of flight
-    pulse_duration = pulse_end - pulse_start
-    distance = pulse_duration * 17150  # Convert to distance in cm
-    
-    # Filter values outside the 2 cm to 800 cm range
-    if distance < 2 or distance > 800:
-        distance = 0
-    
-    return round(distance, 2)
 
-def loop():
+    # Set SIG_PIN as input to read the echo duration
+    GPIO.setup(SIG_PIN, GPIO.IN)
+
+    # Measure the time duration of the pulse
+    rx_time = GPIO.wait_for_edge(SIG_PIN, GPIO.FALLING, timeout=100)  # Maximum wait time of 100 ms
+    
+    if rx_time is None:
+        return 0  # No response within the given time
+
+    distance = rx_time * 34 / 2000.0  # Convert time to distance (in cm)
+
+    # Limit distance to between 2 cm and 800 cm
+    if distance < 2 or distance > 800:
+        return 0
+
+    return distance
+
+try:
     while True:
         distance = get_distance()
-        print("Distance:", distance, "cm")
-        time.sleep(0.1)
+        print("distance: {:.2f} CM".format(distance))
+        time.sleep(0.01)  # 10 ms pause between readings
 
-def cleanup():
+except KeyboardInterrupt:
+    print("Measurement stopped by user.")
+
+finally:
     GPIO.cleanup()
-
-if __name__ == "__main__":
-    try:
-        setup()
-        loop()
-    except KeyboardInterrupt:
-        cleanup()
