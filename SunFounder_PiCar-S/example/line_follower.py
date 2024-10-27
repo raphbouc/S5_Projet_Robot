@@ -22,8 +22,8 @@ picar.setup()
 REFERENCES = [200, 200, 200, 200, 200]
 calibrate = True
 #calibrate = False
-forward_speed = 10
-backward_speed = 10
+forward_speed = 20
+backward_speed = 20
 turning_angle = 40
 
 max_off_track_count = 40
@@ -61,7 +61,7 @@ def main():
 	bw.forward()
 	while True:
 		lt_status_now = lf.read_digital()
-		print(lt_status_now)
+		#print(lt_status_now)
 		# Angle calculate
 		if	lt_status_now == [0,0,1,0,0]:
 			step = 0	
