@@ -12,5 +12,5 @@ while True:
 	print(lf.read_digital())
 	print('')
 	previous = current
-	time.sleep(0.5)
+	time.sleep(2)
 
