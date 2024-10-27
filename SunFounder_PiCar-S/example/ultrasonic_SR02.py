@@ -1,12 +1,13 @@
 import time
 import RPi.GPIO as GPIO
 
+# -*- coding: utf-8 -*-
 SIG_PIN = 38  # PIN GPIO pour le signal du capteur (modifiez en fonction de votre configuration)
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(SIG_PIN, GPIO.OUT)
 
 def get_distance():
-    # Générer une impulsion de 20 µs pour déclencher la mesure
+    # Generer une impulsion de 20 µs pour déclencher la mesure
     GPIO.output(SIG_PIN, GPIO.HIGH)
     time.sleep(0.00002)  # 20 microsecondes
     GPIO.output(SIG_PIN, GPIO.LOW)
@@ -18,7 +19,7 @@ def get_distance():
     rx_time = GPIO.wait_for_edge(SIG_PIN, GPIO.FALLING, timeout=100) # Temps maximum d'attente 100 ms
     
     if rx_time is None:
-        return 0  # Pas de réponse dans le délai imparti
+        return 0  # Pas de réponse dans le delai imparti
 
     distance = rx_time * 34 / 2000.0  # Convertir le temps en distance (en cm)
 
