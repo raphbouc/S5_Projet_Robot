@@ -114,7 +114,7 @@ def main():
 		time.sleep(delay)
 
 def cali():
-	time.sleep(60)
+	time.sleep(20)
 	references = [0, 0, 0, 0, 0]
 	print("cali for module:\n  first put all sensors on white, then put all sensors on black")
 	mount = 100
@@ -131,7 +131,7 @@ def cali():
 	time.sleep(1)
 
 	fw.turn(110)
-	time.sleep(30)
+	time.sleep(10)
 	print("\n cali black")
 	time.sleep(4)
 	fw.turn(90)
@@ -147,7 +147,7 @@ def cali():
 		references[i] = (white_references[i] + black_references[i]) / 2
 	lf.references = references
 	print("Middle references =", references)
-	time.sleep(30)
+	time.sleep(10)
 
 def destroy():
 	bw.stop()
