@@ -28,11 +28,11 @@ def get_distance():
         return 0
 
     return distance
-
+ 
 try:
     while True:
         distance = get_distance()
-        print(f"distance: {distance:.2f} CM")
+        print("distance: {:.2f} CM".format(distance))
         time.sleep(0.01)  # Pause de 10 ms
 
 except KeyboardInterrupt:
