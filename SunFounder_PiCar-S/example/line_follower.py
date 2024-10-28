@@ -73,7 +73,6 @@ def forward():
 
 	while True :
 		lt_status_now = lf.read_digital()
-		print(lt_status_now)
 		# Angle calculate
 		if	lt_status_now == [0,0,1,0,0]:
 			step = 0
@@ -169,7 +168,6 @@ def backward():
 	time.sleep(2)
 	while True :
 		lt_status_now = lf.read_digital()
-		print(lt_status_now)
 		# Angle calculate
 		if	lt_status_now == [0,0,1,0,0]:
 			step = 0
@@ -185,8 +183,8 @@ def backward():
 		if	lt_status_now == [0,0,1,0,0]:
 			off_track_count = 0
 			fw.turn(90)
-		elif lt_status_now in ([1,0,0,0,0]):
-			off_track_count = 0
+		elif lt_status_now[0] == 1:
+			print('ICI')
 			turning_angle = int(90 + step)
 			fw.turn(turning_angle)
 			time.sleep(0.2)
@@ -195,8 +193,8 @@ def backward():
 			fw.turn(90)
 			bw.backward()
 			lf.wait_tile_center()
-		elif lt_status_now in ([0,0,0,0,1]):
-			off_track_count = 0
+		elif lt_status_now[4] == 1:
+			print('ICI2')
 			turning_angle = int(90 - step)
 			fw.turn(turning_angle)
 			bw.forward()
