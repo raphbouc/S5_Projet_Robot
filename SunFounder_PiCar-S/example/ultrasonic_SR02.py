@@ -38,6 +38,8 @@ def get_distance():
     if distance < 2 or distance > 800:
         distance = 0
     
+    GPIO.setup(SIG_PIN, GPIO.OUT)
+    
     return round(distance, 2)
 
 def loop():
