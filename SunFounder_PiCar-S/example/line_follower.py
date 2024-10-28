@@ -65,14 +65,16 @@ def main():
 	off_track_count = 0
 	print('Speed?')
 	bw.speed = forward_speed
-	print('Speed fait')
-	#speed = forward_speed
+	print('Speed fait :', bw.speed)
+	speed = forward_speed
 
 	a_step = 3
 	b_step = 10
 	c_step = 30
 	d_step = 45
+	print('Forward?')
 	bw.forward()
+	print('Forward fait')
 	while True:
 		print('bw Speed : ', bw.speed)
 		lt_status_now = lf.read_digital()
