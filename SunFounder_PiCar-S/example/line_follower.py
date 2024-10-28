@@ -25,7 +25,7 @@ forward_speed = 30
 backward_speed = 30
 turning_angle = 40
 acceleration = 1
-vmax = 50
+vmax = 80
 vmin = 25
 
 max_off_track_count = 40
@@ -60,10 +60,8 @@ def reduce_speed(speed):
 	return newspeed
 
 def main():
-	print('Je commence')
 	global turning_angle
 	off_track_count = 0
-	print('Speed?')
 	bw.speed = forward_speed
 	speed = forward_speed
 
@@ -71,11 +69,8 @@ def main():
 	b_step = 10
 	c_step = 30
 	d_step = 45
-	print('Forward?')
 	bw.forward()
-	print('Forward fait')
 	while True:
-		print('bw Speed : ')
 		lt_status_now = lf.read_digital()
 		print(lt_status_now)
 		# Angle calculate
