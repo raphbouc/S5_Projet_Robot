@@ -22,7 +22,7 @@ picar.setup()
 REFERENCES = [200, 200, 200, 200, 200]
 calibrate = True
 forward_speed = 30
-backward_speed = 30
+backward_speed = 25
 turning_angle = 40
 acceleration = 1
 vmax = 45
@@ -151,94 +151,72 @@ def stop(speed):
 		bw.stop()
 
 def backward():
-    global turning_angle
-    off_track_count = 0
-    bw.speed = backward_speed
-    speed = backward_speed
+	global turning_angle
+	off_track_count = 0
+	bw.speed = backward_speed
 
-    a_step = 3
-    b_step = 10
-    c_step = 30
-    d_step = 45
-    bw.backward()
+	a_step = 7
+	b_step = 15
+	c_step = 45
+	d_step = 45
+	bw.backward()
 
-    lt_status_now = lf.read_digital()
-    while sum(lt_status_now) < 4:
-        lt_status_now = lf.read_digital()
-    time.sleep(2)
-    
-    while True:
-        lt_status_now = lf.read_digital()
-        print(lt_status_now)
+	lt_status_now = lf.read_digital()
+	while (lt_status_now < 4):
+		lt_status_now = lf.read_digital()
+	time.sleep(2)
+	while True :
+		lt_status_now = lf.read_digital()
+		print(lt_status_now)
+		# Angle calculate
+		if	lt_status_now == [0,0,1,0,0]:
+			step = 0
+		elif lt_status_now == [0,1,1,0,0] or lt_status_now == [0,0,1,1,0]:
+			step = a_step
+		elif lt_status_now == [0,1,0,0,0] or lt_status_now == [0,0,0,1,0]:
+			step = b_step
+		elif lt_status_now == [1,1,0,0,0] or lt_status_now == [0,0,0,1,1]:
+			step = c_step
+		elif lt_status_now == [1,0,0,0,0] or lt_status_now == [0,0,0,0,1]:
+			step = d_step
+		# Direction calculate
+		if	lt_status_now == [0,0,1,0,0]:
+			off_track_count = 0
+			fw.turn(90)
+		# turn right
+		elif lt_status_now in ([0,1,1,0,0],[0,1,0,0,0],[1,1,0,0,0],[1,0,0,0,0]):
+			off_track_count = 0
+			turning_angle = int(90 - step)
+		# turn left
+		elif lt_status_now in ([0,0,1,1,0],[0,0,0,1,0],[0,0,0,1,1],[0,0,0,0,1]):
+			off_track_count = 0
+			turning_angle = int(90 + step)
+		elif lt_status_now == [0,0,0,0,0]:
+			off_track_count += 1
+			if off_track_count > max_off_track_count:
+				#tmp_angle = -(turning_angle - 90) + 90
+				tmp_angle = (turning_angle-90)/abs(90-turning_angle)
+				tmp_angle *= fw.turning_max
+				bw.speed = backward_speed
+				bw.forward()
+				fw.turn(tmp_angle)
+				
+				lf.wait_tile_center()
+				bw.stop()
 
-        # Angle calculation
-        if lt_status_now == [0,0,1,0,0]:
-            step = 0
-            if speed < vmax:
-                speed = augment_speed(speed)
-                bw.speed = speed
-        elif lt_status_now in ([0,1,1,0,0], [0,0,1,1,0]):
-            step = a_step
-            if speed < vmax:
-                speed = augment_speed(speed)
-                bw.speed = speed
-        elif lt_status_now in ([0,1,0,0,0], [0,0,0,1,0]):
-            step = b_step
-            if speed < vmax:
-                speed = augment_speed(speed)
-                bw.speed = speed
-        elif lt_status_now in ([1,1,0,0,0], [0,0,0,1,1]):
-            step = c_step
-            if speed > vmin:
-                speed = reduce_speed(speed)
-                bw.speed = speed
-        elif lt_status_now in ([1,0,0,0,0], [0,0,0,0,1]):
-            step = d_step
-            if speed > vmin:
-                speed = reduce_speed(speed)
-                bw.speed = speed
+				fw.turn(turning_angle)
+				time.sleep(0.2)
+				bw.speed = forward_speed
+				bw.backward()
+				time.sleep(0.2)
 
-        # Direction calculation with anticipation logic
-        if lt_status_now == [0,0,1,0,0]:
-            off_track_count = 0
-            fw.turn(90)
-        # Turn left (anticipating correction)
-        elif lt_status_now in ([0,1,1,0,0], [0,1,0,0,0], [1,1,0,0,0], [1,0,0,0,0]):
-            off_track_count = 0
-            turning_angle = int(90 + step)  # turn left
-        # Turn right (anticipating correction)
-        elif lt_status_now in ([0,0,1,1,0], [0,0,0,1,0], [0,0,0,1,1], [0,0,0,0,1]):
-            off_track_count = 0
-            turning_angle = int(90 - step)  # turn right
-        elif lt_status_now == [0,0,0,0,0]:
-            off_track_count += 1
-            if off_track_count > max_off_track_count:
-                # Pre-emptive forward correction before backward adjustment
-                bw.speed = forward_speed
-                bw.forward()
-                time.sleep(0.1)  # Brief forward move for alignment
+				
 
-                # Apply turning angle for correction during backward movement
-                tmp_angle = (turning_angle - 90) / abs(90 - turning_angle)
-                tmp_angle *= fw.turning_max
-                bw.speed = backward_speed
-                bw.backward()
-                fw.turn(tmp_angle)
-
-                lf.wait_tile_center()
-                bw.stop()
-
-                # Realign and prepare for next move
-                fw.turn(turning_angle)
-                time.sleep(0.2)
-                bw.speed = backward_speed
-                bw.backward()
-                time.sleep(0.2)
-        else:
-            off_track_count = 0
-
-        fw.turn(turning_angle)
-        time.sleep(delay)
+		else:
+			off_track_count = 0
+	
+		fw.turn(turning_angle)
+		time.sleep(delay)
 
 
 def cali():
