@@ -225,7 +225,7 @@ def backward():
                 bw.backward()
                 fw.turn(tmp_angle)
 
-                lf.wait_tile_center()  # Wait until it’s aligned with the tile center
+                lf.wait_tile_center()
                 bw.stop()
 
                 # Realign and prepare for next move
