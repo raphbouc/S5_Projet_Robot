@@ -20,8 +20,7 @@ import picar
 picar.setup()
 
 REFERENCES = [200, 200, 200, 200, 200]
-calibrate = True
-#calibrate = False
+calibrate = False
 forward_speed = 30
 backward_speed = 30
 turning_angle = 40
@@ -61,9 +60,12 @@ def reduce_speed(speed):
 	return newspeed
 
 def main():
+	print('Je commence')
 	global turning_angle
 	off_track_count = 0
+	print('Speed?')
 	bw.speed = forward_speed
+	print('Speed fait')
 	#speed = forward_speed
 
 	a_step = 3
