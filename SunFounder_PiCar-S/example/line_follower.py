@@ -64,7 +64,7 @@ def main():
 	global turning_angle
 	off_track_count = 0
 	bw.speed = forward_speed
-	speed = forward_speed
+	#speed = forward_speed
 
 	a_step = 3
 	b_step = 10
