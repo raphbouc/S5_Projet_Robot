@@ -197,20 +197,26 @@ def backward():
 			time.sleep(0.2)
 			bw.forward()
 			time.sleep(1)
+			bw.stop()
 			fw.turn(90 - step_offset)
+			bw.backward()
 			time.sleep(0.5)
 			fw.turn(90)
 			time.sleep(0.2)
-			bw.backward()
 			lf.wait_tile_center
 		elif lt_status_now[4] == 1:
 			print('ICI2')
 			turning_angle = int(90 - step)
 			fw.turn(turning_angle)
+			time.sleep(0.2)
 			bw.forward()
 			time.sleep(1)
-			fw.turn(90)
+			bw.stop()
+			fw.turn(90 + step_offset)
 			bw.backward()
+			time.sleep(0.5)
+			fw.turn(90)
+			time.sleep(0.2)
 			lf.wait_tile_center
 		elif lt_status_now == [0,0,0,0,0]:
 			off_track_count += 1
