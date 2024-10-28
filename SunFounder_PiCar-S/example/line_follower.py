@@ -100,7 +100,7 @@ def forward():
 			if speed > vmin:
 				speed = reduce_speed(speed)
 				bw.speed = speed
-		elif sum(lt_status_now) >= 4 : 
+		elif sum(lt_status_now) > 3 : 
 			break
 		# Direction calculate
 		if	lt_status_now == [0,0,1,0,0]:
@@ -149,6 +149,7 @@ def stop(speed):
 		bw.speed = speed
 		fw.turn(90)
 		bw.stop()
+		time.sleep(delay)
 
 def backward():
 	global turning_angle
@@ -164,6 +165,7 @@ def backward():
 	lt_status_now = lf.read_digital()
 	while (lt_status_now < 4):
 		lt_status_now = lf.read_digital()
+		time.sleep(delay)
 	time.sleep(2)
 	while True :
 		lt_status_now = lf.read_digital()
