@@ -24,7 +24,7 @@ calibrate = False
 forward_speed = 30
 backward_speed = 30
 turning_angle = 40
-acceleration = 0.1
+acceleration = 1
 vmax = 50
 vmin = 25
 
