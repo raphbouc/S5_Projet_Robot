@@ -72,32 +72,34 @@ def main():
 	d_step = 45
 	bw.forward()
 	while True:
+		print('bw Speed : ', bw.speed)
 		lt_status_now = lf.read_digital()
 		print(lt_status_now)
 		# Angle calculate
 		if	lt_status_now == [0,0,1,0,0]:
 			step = 0
-			if bw.speed < vmax:
+			if speed < vmax:
+				print('Je suis ici')
 				speed = augment_speed(speed)
 				bw.speed = speed
 		elif lt_status_now == [0,1,1,0,0] or lt_status_now == [0,0,1,1,0]:
 			step = a_step
-			if bw.speed < vmax:
+			if speed < vmax:
 				speed = augment_speed(speed)
 				bw.speed = speed
 		elif lt_status_now == [0,1,0,0,0] or lt_status_now == [0,0,0,1,0]:
 			step = b_step
-			if bw.speed < vmax:
+			if speed < vmax:
 				speed = augment_speed(speed)
 				bw.speed = speed
 		elif lt_status_now == [1,1,0,0,0] or lt_status_now == [0,0,0,1,1]:
 			step = c_step
-			if bw.speed > vmin:
+			if speed > vmin:
 				speed = reduce_speed(speed)
 				bw.speed = speed
 		elif lt_status_now == [1,0,0,0,0] or lt_status_now == [0,0,0,0,1]:
 			step = d_step
-			if bw.speed > vmin:
+			if speed > vmin:
 				speed = reduce_speed(speed)
 				bw.speed = speed
 
