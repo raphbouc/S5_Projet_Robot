@@ -25,7 +25,7 @@ forward_speed = 30
 backward_speed = 30
 turning_angle = 40
 acceleration = 1
-vmax = 60
+vmax = 50
 vmin = 25
 
 max_off_track_count = 40
@@ -100,7 +100,14 @@ def main():
 			if speed > vmin:
 				speed = reduce_speed(speed)
 				bw.speed = speed
-
+		elif sum(lt_status_now) > 3 : 
+			while (speed > 0) : 
+				speed = reduce_speed(speed)
+				bw.speed = speed
+				off_track_count = 0
+				fw.turn(90)
+			bw.stop()
+			False
 		# Direction calculate
 		if	lt_status_now == [0,0,1,0,0]:
 			off_track_count = 0
