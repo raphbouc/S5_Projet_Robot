@@ -185,16 +185,17 @@ def backward():
 		if	lt_status_now == [0,0,1,0,0]:
 			off_track_count = 0
 			fw.turn(90)
-		elif lt_status_now in ([1,1,0,0,0],[1,0,0,0,0]):
+		elif lt_status_now in ([1,0,0,0,0]):
 			off_track_count = 0
 			turning_angle = int(90 + step)
 			fw.turn(turning_angle)
+			time.sleep(0.2)
 			bw.forward()
 			time.sleep(1)
 			fw.turn(90)
 			bw.backward()
 			lf.wait_tile_center()
-		elif lt_status_now in ([0,0,0,1,1],[0,0,0,0,1]):
+		elif lt_status_now in ([0,0,0,0,1]):
 			off_track_count = 0
 			turning_angle = int(90 - step)
 			fw.turn(turning_angle)
@@ -205,7 +206,7 @@ def backward():
 			lf.wait_tile_center()
 		elif lt_status_now == [0,0,0,0,0]:
 			off_track_count += 1
-			if off_track_count > max_off_track_count:
+			""" if off_track_count > max_off_track_count:
 				#tmp_angle = -(turning_angle - 90) + 90
 				tmp_angle = (turning_angle-90)/abs(90-turning_angle)
 				tmp_angle *= fw.turning_max
@@ -220,7 +221,7 @@ def backward():
 				time.sleep(0.2)
 				bw.speed = forward_speed
 				bw.backward()
-				time.sleep(0.2)
+				time.sleep(0.2) """
 
 				
 
