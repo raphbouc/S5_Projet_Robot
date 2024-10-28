@@ -192,7 +192,7 @@ def backward():
 			time.sleep(1)
 			fw.turn(90)
 			bw.backward()
-			lf.wait_tile_center()
+			lf.wait_tile_1of3()
 		elif lt_status_now[4] == 1:
 			print('ICI2')
 			turning_angle = int(90 - step)
@@ -201,7 +201,7 @@ def backward():
 			time.sleep(1)
 			fw.turn(90)
 			bw.backward()
-			lf.wait_tile_center()
+			lf.wait_tile_1of3()
 		elif lt_status_now == [0,0,0,0,0]:
 			off_track_count += 1
 			""" if off_track_count > max_off_track_count:
