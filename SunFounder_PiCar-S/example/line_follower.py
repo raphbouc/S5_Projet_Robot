@@ -153,7 +153,7 @@ def stop(speed):
 def wait_tile_1of3():
 		while True:
 			lt_status = lf.read_digital()
-			if lt_status[2] == 1 or lt_status[1] == 1 or lt_status[3] == 1:
+			if lt_status[2] == 1 or (lt_status[1] == 1 and lt_status[2] == 1) or (lt_status[3] == 1 and lt_status[2]):
 				break
 
 def backward():
@@ -165,6 +165,7 @@ def backward():
 	b_step = 0
 	c_step = 30
 	d_step = 45
+	step_offset = 10
 	bw.backward()
 
 	lt_status_now = lf.read_digital()
@@ -196,9 +197,12 @@ def backward():
 			time.sleep(0.2)
 			bw.forward()
 			time.sleep(1)
+			fw.turn(90 - step_offset)
+			time.sleep(0.5)
 			fw.turn(90)
+			time.sleep(0.2)
 			bw.backward()
-			wait_tile_1of3()
+			lf.wait_tile_center
 		elif lt_status_now[4] == 1:
 			print('ICI2')
 			turning_angle = int(90 - step)
@@ -207,7 +211,7 @@ def backward():
 			time.sleep(1)
 			fw.turn(90)
 			bw.backward()
-			wait_tile_1of3()
+			lf.wait_tile_center
 		elif lt_status_now == [0,0,0,0,0]:
 			off_track_count += 1
 			""" if off_track_count > max_off_track_count:
