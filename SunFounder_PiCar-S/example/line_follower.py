@@ -64,6 +64,7 @@ def main():
 	global turning_angle
 	off_track_count = 0
 	bw.speed = forward_speed
+	speed = forward_speed
 
 	a_step = 3
 	b_step = 10
@@ -77,23 +78,28 @@ def main():
 		if	lt_status_now == [0,0,1,0,0]:
 			step = 0
 			if bw.speed < vmax:
-				bw.speed = augment_speed(bw.speed)
+				speed = augment_speed(speed)
+				bw.speed = speed
 		elif lt_status_now == [0,1,1,0,0] or lt_status_now == [0,0,1,1,0]:
 			step = a_step
 			if bw.speed < vmax:
-				bw.speed = augment_speed(bw.speed)
+				speed = augment_speed(speed)
+				bw.speed = speed
 		elif lt_status_now == [0,1,0,0,0] or lt_status_now == [0,0,0,1,0]:
 			step = b_step
 			if bw.speed < vmax:
-				bw.speed = augment_speed(bw.speed)
+				speed = augment_speed(speed)
+				bw.speed = speed
 		elif lt_status_now == [1,1,0,0,0] or lt_status_now == [0,0,0,1,1]:
 			step = c_step
 			if bw.speed > vmin:
-				bw.speed = reduce_speed(bw.speed)
+				speed = reduce_speed(speed)
+				bw.speed = speed
 		elif lt_status_now == [1,0,0,0,0] or lt_status_now == [0,0,0,0,1]:
 			step = d_step
 			if bw.speed > vmin:
-				bw.speed = reduce_speed(bw.speed)
+				speed = reduce_speed(speed)
+				bw.speed = speed
 
 		# Direction calculate
 		if	lt_status_now == [0,0,1,0,0]:
