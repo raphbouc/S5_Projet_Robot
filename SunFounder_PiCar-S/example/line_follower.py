@@ -165,7 +165,7 @@ def backward():
 	b_step = 0
 	c_step = 30
 	d_step = 45
-	step_offset = 10
+	step_offset = 15
 	bw.backward()
 
 	lt_status_now = lf.read_digital()
@@ -198,7 +198,9 @@ def backward():
 			bw.forward()
 			time.sleep(1)
 			bw.stop()
+			time.sleep(0.2)
 			fw.turn(90 - step_offset)
+			time.sleep(0.2)
 			bw.backward()
 			time.sleep(0.5)
 			fw.turn(90)
@@ -212,7 +214,9 @@ def backward():
 			bw.forward()
 			time.sleep(1)
 			bw.stop()
+			time.sleep(0.2)
 			fw.turn(90 + step_offset)
+			time.sleep(0.2)
 			bw.backward()
 			time.sleep(0.5)
 			fw.turn(90)
