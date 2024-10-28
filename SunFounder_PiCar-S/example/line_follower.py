@@ -25,6 +25,9 @@ calibrate = True
 forward_speed = 30
 backward_speed = 30
 turning_angle = 40
+acceleration = 0.1
+vmax = 50
+vmin = 25
 
 max_off_track_count = 40
 
@@ -49,6 +52,14 @@ def setup():
 	if calibrate:
 		cali()
 
+def augment_speed(speed):
+	newspeed = speed + acceleration
+	return newspeed
+
+def reduce_speed(speed):
+	newspeed = speed - acceleration
+	return newspeed
+
 def main():
 	global turning_angle
 	off_track_count = 0
@@ -64,15 +75,25 @@ def main():
 		print(lt_status_now)
 		# Angle calculate
 		if	lt_status_now == [0,0,1,0,0]:
-			step = 0	
+			step = 0
+			if bw.speed < vmax:
+				bw.speed = augment_speed(bw.speed)
 		elif lt_status_now == [0,1,1,0,0] or lt_status_now == [0,0,1,1,0]:
 			step = a_step
+			if bw.speed < vmax:
+				bw.speed = augment_speed(bw.speed)
 		elif lt_status_now == [0,1,0,0,0] or lt_status_now == [0,0,0,1,0]:
 			step = b_step
+			if bw.speed < vmax:
+				bw.speed = augment_speed(bw.speed)
 		elif lt_status_now == [1,1,0,0,0] or lt_status_now == [0,0,0,1,1]:
 			step = c_step
+			if bw.speed > vmin:
+				bw.speed = reduce_speed(bw.speed)
 		elif lt_status_now == [1,0,0,0,0] or lt_status_now == [0,0,0,0,1]:
 			step = d_step
+			if bw.speed > vmin:
+				bw.speed = reduce_speed(bw.speed)
 
 		# Direction calculate
 		if	lt_status_now == [0,0,1,0,0]:
