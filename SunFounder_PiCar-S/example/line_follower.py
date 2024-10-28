@@ -65,7 +65,6 @@ def main():
 	off_track_count = 0
 	print('Speed?')
 	bw.speed = forward_speed
-	print('Speed fait :' + bw.speed)
 	speed = forward_speed
 
 	a_step = 3
@@ -76,7 +75,7 @@ def main():
 	bw.forward()
 	print('Forward fait')
 	while True:
-		print('bw Speed : ', bw.speed)
+		print('bw Speed : ')
 		lt_status_now = lf.read_digital()
 		print(lt_status_now)
 		# Angle calculate
