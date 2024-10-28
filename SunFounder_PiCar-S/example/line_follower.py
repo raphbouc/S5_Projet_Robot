@@ -25,7 +25,7 @@ forward_speed = 30
 backward_speed = 30
 turning_angle = 40
 acceleration = 1
-vmax = 80
+vmax = 60
 vmin = 25
 
 max_off_track_count = 40
