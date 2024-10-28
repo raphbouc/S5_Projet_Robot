@@ -155,8 +155,8 @@ def backward():
 	off_track_count = 0
 	bw.speed = backward_speed
 
-	a_step = 7
-	b_step = 15
+	a_step = 45
+	b_step = 45
 	c_step = 45
 	d_step = 45
 	bw.backward()
