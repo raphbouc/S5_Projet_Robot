@@ -60,6 +60,10 @@ def reduce_speed(speed):
 	return newspeed
 
 def main():
+	speed = forward()
+	stop(speed)
+
+def forward():
 	global turning_angle
 	off_track_count = 0
 	bw.speed = forward_speed
@@ -70,14 +74,14 @@ def main():
 	c_step = 30
 	d_step = 45
 	bw.forward()
-	while True:
+
+	while True :
 		lt_status_now = lf.read_digital()
 		print(lt_status_now)
 		# Angle calculate
 		if	lt_status_now == [0,0,1,0,0]:
 			step = 0
 			if speed < vmax:
-				print('Je suis ici')
 				speed = augment_speed(speed)
 				bw.speed = speed
 		elif lt_status_now == [0,1,1,0,0] or lt_status_now == [0,0,1,1,0]:
@@ -101,13 +105,7 @@ def main():
 				speed = reduce_speed(speed)
 				bw.speed = speed
 		elif sum(lt_status_now) > 3 : 
-			while (speed > 0) : 
-				speed = reduce_speed(speed)
-				bw.speed = speed
-				off_track_count = 0
-				fw.turn(90)
-			bw.stop()
-			False
+			break
 		# Direction calculate
 		if	lt_status_now == [0,0,1,0,0]:
 			off_track_count = 0
@@ -146,6 +144,15 @@ def main():
 	
 		fw.turn(turning_angle)
 		time.sleep(delay)
+
+	return speed
+
+def stop(speed):
+	while (speed > 0) : 
+		speed = reduce_speed(speed)
+		bw.speed = speed
+		fw.turn(90)
+		bw.stop()
 
 def cali():
 	time.sleep(20)
