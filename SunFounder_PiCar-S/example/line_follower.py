@@ -163,7 +163,7 @@ def backward():
 	bw.backward()
 
 	lt_status_now = lf.read_digital()
-	while (lt_status_now < 2):
+	while (lt_status_now < 4):
 		lt_status_now = lf.read_digital()
 	time.sleep(2)
 	while True :
