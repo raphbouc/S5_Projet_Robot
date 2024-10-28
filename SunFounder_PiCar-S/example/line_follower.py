@@ -65,7 +65,7 @@ def main():
 	off_track_count = 0
 	print('Speed?')
 	bw.speed = forward_speed
-	print('Speed fait :', bw.speed)
+	print('Speed fait :' + bw.speed)
 	speed = forward_speed
 
 	a_step = 3
