@@ -279,6 +279,11 @@ def main():
 	stop(speed)
 	backward()
 
+def main():
+	speed = forward()
+	stop(speed)
+	backward()
+
 if __name__ == '__main__':
 	try:
 		try:
