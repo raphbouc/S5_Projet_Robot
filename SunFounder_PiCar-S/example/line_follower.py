@@ -25,7 +25,7 @@ forward_speed = 30
 backward_speed = 30
 turning_angle = 40
 acceleration = 1
-vmax = 50
+vmax = 45
 vmin = 25
 
 max_off_track_count = 40
@@ -100,7 +100,7 @@ def forward():
 			if speed > vmin:
 				speed = reduce_speed(speed)
 				bw.speed = speed
-		elif sum(lt_status_now) > 3 : 
+		elif sum(lt_status_now) >= 4 : 
 			break
 		# Direction calculate
 		if	lt_status_now == [0,0,1,0,0]:
@@ -198,41 +198,48 @@ def backward():
                 speed = reduce_speed(speed)
                 bw.speed = speed
 
-        # Direction calculation (reversed)
+        # Direction calculation with anticipation logic
         if lt_status_now == [0,0,1,0,0]:
             off_track_count = 0
             fw.turn(90)
-        # Turn left (as it's backward, right becomes left)
+        # Turn left (anticipating correction)
         elif lt_status_now in ([0,1,1,0,0], [0,1,0,0,0], [1,1,0,0,0], [1,0,0,0,0]):
             off_track_count = 0
             turning_angle = int(90 + step)  # turn left
-        # Turn right
+        # Turn right (anticipating correction)
         elif lt_status_now in ([0,0,1,1,0], [0,0,0,1,0], [0,0,0,1,1], [0,0,0,0,1]):
             off_track_count = 0
             turning_angle = int(90 - step)  # turn right
         elif lt_status_now == [0,0,0,0,0]:
             off_track_count += 1
             if off_track_count > max_off_track_count:
+                # Pre-emptive forward correction before backward adjustment
+                bw.speed = forward_speed
+                bw.forward()
+                time.sleep(0.1)  # Brief forward move for alignment
+
+                # Apply turning angle for correction during backward movement
                 tmp_angle = (turning_angle - 90) / abs(90 - turning_angle)
                 tmp_angle *= fw.turning_max
-                bw.speed = forward_speed  # Temporary move forward to recover
-                bw.forward()
+                bw.speed = backward_speed
+                bw.backward()
                 fw.turn(tmp_angle)
 
-                lf.wait_tile_center()
+                lf.wait_tile_center()  # Wait until it’s aligned with the tile center
                 bw.stop()
 
+                # Realign and prepare for next move
                 fw.turn(turning_angle)
                 time.sleep(0.2)
                 bw.speed = backward_speed
                 bw.backward()
                 time.sleep(0.2)
-
         else:
             off_track_count = 0
 
         fw.turn(turning_angle)
         time.sleep(delay)
+
 
 def cali():
 	time.sleep(20)
