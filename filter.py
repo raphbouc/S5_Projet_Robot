@@ -132,7 +132,27 @@ def test_floating_average(input_min_value=20, input_max_value=100, input_min_err
     print(f"longueur des donnees retenu: {len(data)}")
 
 
-
+def apply_fir_filter(data, cutoff=2, fs=8, numtaps=51):
+    """
+    Apply a FIR low-pass filter to the data to smooth out high-frequency abnormalities.
+    
+    Parameters:
+    - data: list or numpy array of sampled data points.
+    - cutoff: the cutoff frequency in Hz (default is 2 Hz, adjust as needed).
+    - fs: the sampling frequency in Hz (default is 8 Hz, based on 0.125 sec intervals).
+    - numtaps: the number of filter coefficients (higher gives a sharper cutoff).
+    
+    Returns:
+    - filtered_data: the data after FIR filtering.
+    """
+    # Design a FIR filter with the specified cutoff frequency and number of taps
+    fir_coeff = signal.firwin(numtaps, cutoff, fs=fs)
+    if len(data) < 3*numtaps:
+        raise ValueError("The length of the data needs to be at least 3 times as large as numtaps. Please ensure a buffer is implemented.")
+    
+    filtered_data = signal.filtfilt(fir_coeff, [1.0], data)
+    
+    return filtered_data
 
 
 
@@ -140,6 +160,16 @@ if __name__ == '__main__':
     fe = 1 / 0.125
     fc = fe / 2
 
-    test = [2, 2, 2, 2]
-    test_filter()
+    # test_filter()
 
+    data = create_fake_measurements(length=304, num_errors=20)
+    # data = np.concatenate((np.full(1000, 100), np.full(1000, 10), np.full(1000, 50),))
+    filtered_data = apply_fir_filter(data, cutoff=0.5, numtaps=101)
+
+    # Plotting the result
+    plt.plot(data, label='Original Data')
+    plt.plot(filtered_data, label='Filtered Data', linestyle='--')
+    plt.xlabel('Sample')
+    plt.ylabel('Amplitude')
+    plt.legend()
+    plt.show()
