@@ -71,7 +71,7 @@ def create_filter(fs, fc, ws, rp=0.2, rs=60, filter_type: Literal["butter", "che
     # plt.tight_layout()
     # plt.show()
 
-    # print(f"ordre min: {N_min}")
+    print(f"ordre min: {N_min}")
     # print(f"zeroes: {zeroes}")
     # print(f"poles: {poles}")
 
@@ -79,6 +79,20 @@ def create_filter(fs, fc, ws, rp=0.2, rs=60, filter_type: Literal["butter", "che
 
 def filter_data(data, b, a):
     return signal.lfilter(b, a, data)
+
+def test_filter():
+    fake_measurements = create_fake_measurements(length=50, num_errors=10)
+    initial_length = 20
+    print(fake_measurements[initial_length:])
+    b, a = create_filter(8, 2, 3)
+    output_data = fake_measurements[:initial_length]
+    for input in fake_measurements[initial_length:]:
+        print("==========================")
+        print(f"Valeur en entree: {input}")
+        output_data = np.append(output_data, input)
+        output_data = filter_data(output_data, b, a)
+        output = output_data[-1]
+        print(f"Valeur en sortie: {output}")
 
 def averaged_input(input, array):
     new_avg = (sum(array) + input) / (len(array) + 1)
@@ -117,17 +131,7 @@ def test_floating_average(input_min_value=20, input_max_value=100, input_min_err
 
     print(f"longueur des donnees retenu: {len(data)}")
 
-def test_filter():
-    fake_measurements = create_fake_measurements(length=50)
-    b, a = create_filter(8, 3, 4)
-    output_data = fake_measurements[:10]
-    for input in fake_measurements[10:]:
-        print("==========================")
-        print(f"Valeur en entree: {input}")
-        output_data = np.append(output_data, input)
-        output_data = filter_data(output_data, b, a)
-        output = output_data[-1]
-        print(f"Valeur en sortie: {output}")
+
 
 
 
@@ -137,10 +141,5 @@ if __name__ == '__main__':
     fc = fe / 2
 
     test = [2, 2, 2, 2]
-    test_floating_average()
-    # test_filter()
-
-
-
-
+    test_filter()
 
