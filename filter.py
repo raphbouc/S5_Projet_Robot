@@ -98,7 +98,7 @@ def test_step_increment_floating_average(max_length=10):
     plt.show()
 
 
-def apply_fir_filter(data, cutoff=1, fs=8, numtaps=51):
+def apply_fir_filter(data, cutoff=1, fs=8, numtaps=101):
 
     # Design a FIR filter with the specified cutoff frequency and number of taps
     fir_coeff = signal.firwin(numtaps, cutoff, fs=fs)
@@ -133,7 +133,7 @@ def test_linear_increment_fir_filter(input_length=3000, input_errors=300, fc=1, 
     plt.legend()
     plt.show()
 
-def test_step_increment_fir_filter(input_length=1000, input_errors=100, fc=1, fs=8, filter_numtaps=303):
+def test_step_increment_fir_filter(input_length=1000, input_errors=100, fc=1, fs=8, filter_numtaps=101):
     step_signal = generate_step_increment()
     buffer_array = []
     filtered_data = []
