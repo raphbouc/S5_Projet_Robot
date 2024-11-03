@@ -46,6 +46,9 @@ def test_linear_increment_floating_average(input_min_value=20, input_max_value=1
         print(f"Valeur en sortie: {output}")
 
     print(f"longueur des donnees retenu: {len(data)}")
+    print(f"longueur de filtered data {len(filtered_data)}")
+    rmse = calculate_rmse(fake_measurements[max_length:], filtered_data)
+    print(f"rmse: {rmse}")
 
     # Plotting the result
     plt.plot(fake_measurements[max_length:], label='Original Data')
@@ -88,6 +91,9 @@ def test_step_increment_floating_average(max_length=10):
 
     print(f"longueur des donnees retenu: {len(data)}")
 
+    rmse = calculate_rmse(step_signal[max_length:], filtered_data)
+    print(f"rmse: {rmse}")
+
     # Plotting the result
     plt.plot(step_signal[max_length:], label='Original Data')
     plt.plot(filtered_data, label='Filtered Data', linestyle='--')
@@ -109,7 +115,7 @@ def apply_fir_filter(data, cutoff=1, fs=8, numtaps=51):
     return filtered_data
 
 
-def test_linear_increment_fir_filter(input_length=3000, input_errors=300, fc=1, fs=8, filter_numtaps=101):
+def test_linear_increment_fir_filter(input_length=1000, input_errors=100, fc=1, fs=8, filter_numtaps=101):
     input_data = create_fake_measurements(length=input_length, num_errors=input_errors)
     buffer_array = []
     filtered_data = []
@@ -123,6 +129,9 @@ def test_linear_increment_fir_filter(input_length=3000, input_errors=300, fc=1, 
         print(f"Valeur en entrée: {input}")
         filtered_data = apply_fir_filter(buffer_array, fc, fs, filter_numtaps)
         print(f"Valeur en sortie: {filtered_data[-1]}")
+    
+    rmse = calculate_rmse(buffer_array, filtered_data)
+    print(f"rmse: {rmse}")
 
     # Plotting the result
     plt.plot(buffer_array, label='Original Data')
@@ -148,6 +157,9 @@ def test_step_increment_fir_filter(input_length=1000, input_errors=100, fc=1, fs
         filtered_data = apply_fir_filter(buffer_array, fc, fs, filter_numtaps)
         print(f"Valeur en sortie: {filtered_data[-1]}")
 
+    rmse = calculate_rmse(buffer_array, filtered_data)
+    print(f"rmse: {rmse}")
+
     # Plotting the result
     plt.plot(buffer_array, label='Original Data')
     plt.plot(filtered_data, label='Filtered Data', linestyle='--')
@@ -157,11 +169,15 @@ def test_step_increment_fir_filter(input_length=1000, input_errors=100, fc=1, fs
     plt.legend()
     plt.show()
 
+def calculate_rmse(input, output):
+    rmse = np.sqrt(np.mean((np.array(input) - np.array(output))**2))
+    return rmse
+
 
 
 if __name__ == '__main__':
 
-    test_linear_increment_floating_average()
-    test_linear_increment_fir_filter()
-    test_step_increment_floating_average()
-    test_step_increment_fir_filter()
+    # test_linear_increment_floating_average()
+    test_linear_increment_fir_filter(filter_numtaps=303, input_errors=20)
+    # test_step_increment_floating_average()
+    # test_step_increment_fir_filter()
