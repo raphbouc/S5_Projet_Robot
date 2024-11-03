@@ -1,3 +1,5 @@
 .venv
 .vscode
 .DS_Store
+ultrasonic_module.pyc
+__pycache__
