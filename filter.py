@@ -8,6 +8,17 @@ def averaged_input(input, array):
     new_avg = (sum(array) + input) / (len(array) + 1)
     return new_avg
 
+def median_input(array):
+    sorted_array = sorted(array)
+    n = len(sorted_array)
+    
+    # Calculer la médiane
+    if n % 2 == 0:  # Si le nombre d'éléments est pair
+        median = (sorted_array[n // 2 - 1] + sorted_array[n // 2]) / 2
+    else:  # Si le nombre d'éléments est impair
+        median = sorted_array[n // 2]
+        
+    return median
 
 def push_to_data_array(input, array, max_length):
     if len(array) < max_length:
@@ -16,6 +27,43 @@ def push_to_data_array(input, array, max_length):
         array.pop(0)
         array.append(input)
 
+def filter_uppervalue(input, array, threshold, min_threshold, max_threshold, fake_measurements=None, start_index=0):
+    if len(array) < 5:
+        push_to_data_array(input, array, 5)
+        return array[-1]
+    
+    average_last_five = sum(array[-5:]) / 5
+
+    if (input - average_last_five > threshold):
+        return array[-1]
+    elif abs(input - average_last_five) > min_threshold and abs(input - average_last_five) < max_threshold:
+        push_to_data_array(input, array, 5)
+        return array[-1]
+    else: 
+        # Mode de vérification : on doit accepter les prochaines valeurs similaires
+        for _ in range(5):  # On va vérifier jusqu'à 5 prochaines valeurs
+            if fake_measurements is not None and start_index < len(fake_measurements):
+                new_input = get_next_input(fake_measurements, start_index)
+                start_index += 1
+            else:
+                break  # Si pas de valeurs à lire, sortir de la boucle
+            
+            if new_input > min_threshold:  # Si c'est du bruit
+                print(f"Valeur {new_input} considérée comme bruit et ignorée.")
+                continue  # Ignorer cette valeur et passer à la suivante
+            
+            if abs(new_input - average_last_five) <= threshold:  # Vérifie la proximité
+                push_to_data_array(new_input, array, 5)  # Ajoute la valeur si elle est proche
+                print(f"Valeur {new_input} ajoutée à l'array.")
+            else:
+                print(f"Valeur {new_input} trop éloignée de la moyenne, arrêt de la vérification.")
+                break  # Si une valeur ne correspond pas, on sort de la boucle
+
+        # Retourne la dernière valeur ajoutée après vérification
+        return array[-1]
+
+def get_next_input(fake_measurements, index):
+    return fake_measurements[index]
 
 def create_fake_measurements(min=20, max=100, min_error=5, max_error=150, length=1000, num_errors=50):
     smooth_data = np.linspace(min, max, length)
@@ -42,6 +90,64 @@ def test_linear_increment_floating_average(input_min_value=20, input_max_value=1
         print(f"Valeur en entree: {input}")
         push_to_data_array(input, data, max_length)
         output = averaged_input(input, data)
+        filtered_data.append(output)
+        print(f"Valeur en sortie: {output}")
+
+    print(f"longueur des donnees retenu: {len(data)}")
+    print(f"longueur de filtered data {len(filtered_data)}")
+    rmse = calculate_rmse(fake_measurements[max_length:], filtered_data)
+    print(f"rmse: {rmse}")
+
+    # Plotting the result
+    plt.plot(fake_measurements[max_length:], label='Original Data')
+    plt.plot(filtered_data, label='Filtered Data', linestyle='--')
+    plt.title(f"Valeur d'entrée vs valeur de sortie pour une moyenne flottante de {max_length} échantillons")
+    plt.xlabel('Sample')
+    plt.ylabel('Amplitude')
+    plt.legend()
+    plt.show()
+
+def test_linear_increment_median(input_min_value=20, input_max_value=100, input_min_error=5,
+                          input_max_error=150, fake_input_length=1000, num_errors=50, max_length=10):
+    
+    fake_measurements = create_fake_measurements(input_min_value, input_max_value, input_min_error,
+                                                 input_max_error, fake_input_length, num_errors)
+    data = fake_measurements[:max_length]
+    filtered_data = []
+    for input in fake_measurements[max_length:]:
+        print("==========================")
+        print(f"Valeur en entree: {input}")
+        push_to_data_array(input, data, max_length)
+        output = median_input(data)
+        filtered_data.append(output)
+        print(f"Valeur en sortie: {output}")
+
+    print(f"longueur des donnees retenu: {len(data)}")
+    print(f"longueur de filtered data {len(filtered_data)}")
+    rmse = calculate_rmse(fake_measurements[max_length:], filtered_data)
+    print(f"rmse: {rmse}")
+
+    # Plotting the result
+    plt.plot(fake_measurements[max_length:], label='Original Data')
+    plt.plot(filtered_data, label='Filtered Data', linestyle='--')
+    plt.title(f"Valeur d'entrée vs valeur de sortie pour une médiane de {max_length} échantillons")
+    plt.xlabel('Sample')
+    plt.ylabel('Amplitude')
+    plt.legend()
+    plt.show()
+
+
+def test_linear_increment_uppervalue_filter(input_min_value=20, input_max_value=100, input_min_error=5,
+                          input_max_error=150, fake_input_length=1000, num_errors=50, max_length=10):
+    
+    fake_measurements = create_fake_measurements(input_min_value, input_max_value, input_min_error,
+                                                 input_max_error, fake_input_length, num_errors)
+    data = fake_measurements[:max_length]
+    filtered_data = []
+    for input in fake_measurements[max_length:]:
+        print("==========================")
+        print(f"Valeur en entree: {input}")
+        output = filter_uppervalue(input, data, 20, 0, 5, fake_measurements)
         filtered_data.append(output)
         print(f"Valeur en sortie: {output}")
 
@@ -103,6 +209,31 @@ def test_step_increment_floating_average(max_length=10):
     plt.legend()
     plt.show()
 
+def test_step_increment_median(max_length=10):
+    step_signal = generate_step_increment()
+    data = step_signal[:max_length]
+    filtered_data = []
+    for input in step_signal[max_length:]:
+        print("==========================")
+        print(f"Valeur en entree: {input}")
+        push_to_data_array(input, data, max_length)
+        output = median_input(data)
+        filtered_data.append(output)
+        print(f"Valeur en sortie: {output}")
+
+    print(f"longueur des donnees retenu: {len(data)}")
+
+    rmse = calculate_rmse(step_signal[max_length:], filtered_data)
+    print(f"rmse: {rmse}")
+
+    # Plotting the result
+    plt.plot(step_signal[max_length:], label='Original Data')
+    plt.plot(filtered_data, label='Filtered Data', linestyle='--')
+    plt.title(f"Valeur d'entrée vs valeur de sortie pour une médiane de {max_length} échantillons")
+    plt.xlabel('Sample')
+    plt.ylabel('Amplitude')
+    plt.legend()
+    plt.show()
 
 def apply_fir_filter(data, cutoff=1, fs=8, numtaps=101):
 
@@ -115,15 +246,15 @@ def apply_fir_filter(data, cutoff=1, fs=8, numtaps=101):
     return filtered_data
 
 
-def test_linear_increment_fir_filter(input_length=1000, input_errors=100, fc=1, fs=8, filter_numtaps=101):
+def test_linear_increment_fir_filter(input_length=1000, input_errors=100, fc=0.5, fs=8, filter_numtaps=101):
     input_data = create_fake_measurements(length=input_length, num_errors=input_errors)
     buffer_array = []
     filtered_data = []
 
     for input in input_data:
         print("========================")
-        push_to_data_array(input, buffer_array, (filter_numtaps*3+1))
-        if len(buffer_array) < (filter_numtaps*3+1):
+        push_to_data_array(input, buffer_array, (300))
+        if len(buffer_array) < (300):
             print(f"Loading Buffer")
             continue
         print(f"Valeur en entrée: {input}")
@@ -177,7 +308,10 @@ def calculate_rmse(input, output):
 
 if __name__ == '__main__':
 
-    # test_linear_increment_floating_average()
-    test_linear_increment_fir_filter(filter_numtaps=303, input_errors=20)
-    # test_step_increment_floating_average()
+    test_linear_increment_floating_average()
+    #test_linear_increment_fir_filter(filter_numtaps=3, input_errors=20)
+    #test_linear_increment_uppervalue_filter()
+    test_linear_increment_median()
+    test_step_increment_floating_average()
+    test_step_increment_median()
     # test_step_increment_fir_filter()
