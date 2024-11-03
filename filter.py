@@ -30,19 +30,72 @@ def create_fake_measurements(min=20, max=100, min_error=5, max_error=150, length
     return fake_measurements
 
 
-def test_floating_average(input_min_value=20, input_max_value=100, input_min_error=5,
+def test_linear_increment_floating_average(input_min_value=20, input_max_value=100, input_min_error=5,
                           input_max_error=150, fake_input_length=1000, num_errors=50, max_length=10):
+    
     fake_measurements = create_fake_measurements(input_min_value, input_max_value, input_min_error,
                                                  input_max_error, fake_input_length, num_errors)
     data = fake_measurements[:max_length]
+    filtered_data = []
     for input in fake_measurements[max_length:]:
         print("==========================")
         print(f"Valeur en entree: {input}")
         push_to_data_array(input, data, max_length)
         output = averaged_input(input, data)
+        filtered_data.append(output)
         print(f"Valeur en sortie: {output}")
 
     print(f"longueur des donnees retenu: {len(data)}")
+
+    # Plotting the result
+    plt.plot(fake_measurements[max_length:], label='Original Data')
+    plt.plot(filtered_data, label='Filtered Data', linestyle='--')
+    plt.title(f"Valeur d'entrée vs valeur de sortie pour une moyenne flottante de {max_length} échantillons")
+    plt.xlabel('Sample')
+    plt.ylabel('Amplitude')
+    plt.legend()
+    plt.show()
+
+def generate_step_increment(min_error=5, max_error=200, num_errors=10):
+    # Parameters
+    total_samples = 1000
+    step_interval = 100 
+    initial_value = 50
+    increment = 10
+
+    # Generate step signal
+    steps = total_samples // step_interval
+    step_signal = np.array([initial_value + i * increment for i in range(steps) for _ in range(step_interval)])
+
+    error_indices = np.random.choice(len(step_signal), num_errors, replace=False)
+    for idx in error_indices:
+        # Random errors between min error and max error to simulate sonar misreadings
+        step_signal[idx] = np.random.uniform(min_error, max_error)
+
+    return step_signal.tolist()
+
+def test_step_increment_floating_average(max_length=10):
+    step_signal = generate_step_increment()
+    data = step_signal[:max_length]
+    filtered_data = []
+    for input in step_signal[max_length:]:
+        print("==========================")
+        print(f"Valeur en entree: {input}")
+        push_to_data_array(input, data, max_length)
+        output = averaged_input(input, data)
+        filtered_data.append(output)
+        print(f"Valeur en sortie: {output}")
+
+    print(f"longueur des donnees retenu: {len(data)}")
+
+    # Plotting the result
+    plt.plot(step_signal[max_length:], label='Original Data')
+    plt.plot(filtered_data, label='Filtered Data', linestyle='--')
+    plt.title(f"Valeur d'entrée vs valeur de sortie pour une moyenne flottante de {max_length} échantillons")
+    plt.xlabel('Sample')
+    plt.ylabel('Amplitude')
+    plt.legend()
+    plt.show()
 
 
 def apply_fir_filter(data, cutoff=1, fs=8, numtaps=51):
@@ -56,7 +109,7 @@ def apply_fir_filter(data, cutoff=1, fs=8, numtaps=51):
     return filtered_data
 
 
-def test_fir_filter(input_length=3000, input_errors=300, fc=1, fs=8, filter_numtaps=101):
+def test_linear_increment_fir_filter(input_length=3000, input_errors=300, fc=1, fs=8, filter_numtaps=101):
     input_data = create_fake_measurements(length=input_length, num_errors=input_errors)
     buffer_array = []
     filtered_data = []
@@ -74,7 +127,31 @@ def test_fir_filter(input_length=3000, input_errors=300, fc=1, fs=8, filter_numt
     # Plotting the result
     plt.plot(buffer_array, label='Original Data')
     plt.plot(filtered_data, label='Filtered Data', linestyle='--')
-    plt.title("Valeur d'entrée vs Valeur de sortie dans le buffer à la fin du test")
+    plt.title("Valeur d'entrée vs valeur de sortie dans le buffer à la fin du test")
+    plt.xlabel('Sample')
+    plt.ylabel('Amplitude')
+    plt.legend()
+    plt.show()
+
+def test_step_increment_fir_filter(input_length=1000, input_errors=100, fc=1, fs=8, filter_numtaps=303):
+    step_signal = generate_step_increment()
+    buffer_array = []
+    filtered_data = []
+
+    for input in step_signal:
+        print("========================")
+        push_to_data_array(input, buffer_array, (filter_numtaps*3+1))
+        if len(buffer_array) < (filter_numtaps*3+1):
+            print(f"Loading Buffer")
+            continue
+        print(f"Valeur en entrée: {input}")
+        filtered_data = apply_fir_filter(buffer_array, fc, fs, filter_numtaps)
+        print(f"Valeur en sortie: {filtered_data[-1]}")
+
+    # Plotting the result
+    plt.plot(buffer_array, label='Original Data')
+    plt.plot(filtered_data, label='Filtered Data', linestyle='--')
+    plt.title("Valeur d'entrée vs valeur de sortie dans le buffer à la fin du test")
     plt.xlabel('Sample')
     plt.ylabel('Amplitude')
     plt.legend()
@@ -83,4 +160,8 @@ def test_fir_filter(input_length=3000, input_errors=300, fc=1, fs=8, filter_numt
 
 
 if __name__ == '__main__':
-    test_fir_filter(input_length=2000, input_errors=100, filter_numtaps=201)
+
+    test_linear_increment_floating_average()
+    test_linear_increment_fir_filter()
+    test_step_increment_floating_average()
+    test_step_increment_fir_filter()
