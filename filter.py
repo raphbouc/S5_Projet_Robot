@@ -246,27 +246,30 @@ def apply_fir_filter(data, cutoff=1, fs=8, numtaps=101):
     return filtered_data
 
 
-def test_linear_increment_fir_filter(input_length=1000, input_errors=100, fc=0.5, fs=8, filter_numtaps=101):
+def test_linear_increment_fir_filter(input_length=1000, input_errors=100, fc=1, fs=8, filter_numtaps=101):
     input_data = create_fake_measurements(length=input_length, num_errors=input_errors)
     buffer_array = []
-    filtered_data = []
+    first_filtered_data = []
+    second_filtered_data = []
 
     for input in input_data:
         print("========================")
-        push_to_data_array(input, buffer_array, (300))
-        if len(buffer_array) < (300):
+        push_to_data_array(input, buffer_array, (filter_numtaps*3+1))
+        if len(buffer_array) < (filter_numtaps*3+1):
             print(f"Loading Buffer")
             continue
         print(f"Valeur en entrée: {input}")
-        filtered_data = apply_fir_filter(buffer_array, fc, fs, filter_numtaps)
-        print(f"Valeur en sortie: {filtered_data[-1]}")
+        first_filtered_data = apply_fir_filter(buffer_array, fc, fs, filter_numtaps)
+        second_filtered_data = apply_fir_filter(first_filtered_data, 0.2, fs, filter_numtaps)
+        print(f"Valeur en sortie: {first_filtered_data[-1]}")
     
-    rmse = calculate_rmse(buffer_array, filtered_data)
+    rmse = calculate_rmse(buffer_array, second_filtered_data)
     print(f"rmse: {rmse}")
 
     # Plotting the result
     plt.plot(buffer_array, label='Original Data')
-    plt.plot(filtered_data, label='Filtered Data', linestyle='--')
+    plt.plot(first_filtered_data, label='Filtered Once', linestyle='--')
+    plt.plot(second_filtered_data, label='Filtered Twice', linestyle='--')
     plt.title("Valeur d'entrée vs valeur de sortie dans le buffer à la fin du test")
     plt.xlabel('Sample')
     plt.ylabel('Amplitude')
@@ -368,12 +371,12 @@ def test_linear_increment_rii_filter(input_length=1000, input_errors=100, fs=8, 
 
 if __name__ == '__main__':
 
-    test_linear_increment_rii_filter(fc=0.2, ws=0.5, filter_type="butter")
-    test_linear_increment_rii_filter(fc=0.2, ws=0.5, filter_type="cheby1")
-    test_linear_increment_rii_filter(fc=0.2, ws=0.5, filter_type="cheby2")
-    test_linear_increment_rii_filter(fc=0.2, ws=0.5, filter_type="ellip")
+    # test_linear_increment_rii_filter(fc=0.2, ws=0.5, filter_type="butter")
+    # test_linear_increment_rii_filter(fc=0.2, ws=0.5, filter_type="cheby1")
+    # test_linear_increment_rii_filter(fc=0.2, ws=0.5, filter_type="cheby2")
+    # test_linear_increment_rii_filter(fc=0.2, ws=0.5, filter_type="ellip")
     # test_linear_increment_floating_average()
-    # test_linear_increment_fir_filter(filter_numtaps=3, input_errors=20)
+    test_linear_increment_fir_filter(filter_numtaps=101, input_errors=20)
     # test_linear_increment_uppervalue_filter()
     # test_linear_increment_median()
     # test_step_increment_floating_average()
