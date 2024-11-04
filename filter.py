@@ -304,14 +304,78 @@ def calculate_rmse(input, output):
     rmse = np.sqrt(np.mean((np.array(input) - np.array(output))**2))
     return rmse
 
+def create_rii_filter(fs=8, fc=1, ws=1.5, rp=0.2, rs=60, filter_type: Literal["butter", "cheby1", "cheby2", "ellip"]= "butter"):
+    fs = fs
+    fc = fc
+    wp = fc / (fs / 2)
+    ws = ws / (fs / 2)
+    rp = rp
+    rs = rs
+    if filter_type == "butter":
+        N_min, wn = signal.buttord(wp, ws, rp, rs, fs=fs)
+        print(f"wn {wn}")
+        b, a = signal.butter(N_min, wn, btype="low", output='ba')
+        print(f"ordre du filtre {filter_type}: {N_min}")
+    elif filter_type == "cheby1":
+        N_min, wn = signal.cheb1ord(wp, ws, rp, rs, fs=fs)
+        b, a = signal.cheby1(N_min, rp, wn, btype="low", output='ba')
+        print(f"ordre du filtre {filter_type}: {N_min}")
+
+    elif filter_type == "cheby2":
+        N_min, wn = signal.cheb2ord(wp, ws, rp, rs, fs=fs)
+        b, a = signal.cheby2(N_min, rp, wn, btype="low", output='ba')
+        print(f"ordre du filtre {filter_type}: {N_min}")
+
+    elif filter_type == "ellip":
+        N_min, wn = signal.ellipord(wp, ws, rp, rs, fs=fs)
+        b, a = signal.ellip(N_min, rp, rs, wn, btype="low", output='ba')
+        print(f"ordre du filtre {filter_type}: {N_min}")
+
+    return b, a, N_min
+
+def apply_rii_filter(data, b, a):
+    return signal.filtfilt(b, a, data)
+
+def test_linear_increment_rii_filter(input_length=1000, input_errors=100, fs=8, fc=1, ws=1.5, rp=0.2, rs=60, filter_type: Literal["butter", "cheby1", "cheby2", "ellip"]= "butter"):
+    input_data = create_fake_measurements(length=input_length, num_errors=input_errors)
+    b, a, n = create_rii_filter(filter_type=filter_type)
+    buffer_array = []
+    filtered_data = []
+
+    for input in input_data:
+        print("========================")
+        push_to_data_array(input, buffer_array, (67))
+        if len(buffer_array) < (67):
+            print(f"Loading Buffer")
+            continue
+        print(f"Valeur en entrée: {input}")
+        filtered_data = apply_rii_filter(buffer_array, b, a)
+        print(f"Valeur en sortie: {filtered_data[-1]}")
+    
+    rmse = calculate_rmse(buffer_array, filtered_data)
+    print(f"rmse: {rmse}")
+    print(f"filter order: {n}")
+
+    # Plotting the result
+    plt.plot(buffer_array, label='Original Data')
+    plt.plot(filtered_data, label='Filtered Data', linestyle='--')
+    plt.title("Valeur d'entrée vs valeur de sortie dans le buffer à la fin du test")
+    plt.xlabel('Sample')
+    plt.ylabel('Amplitude')
+    plt.legend()
+    plt.show()
 
 
 if __name__ == '__main__':
 
-    test_linear_increment_floating_average()
-    #test_linear_increment_fir_filter(filter_numtaps=3, input_errors=20)
-    #test_linear_increment_uppervalue_filter()
-    test_linear_increment_median()
-    test_step_increment_floating_average()
-    test_step_increment_median()
+    test_linear_increment_rii_filter(fc=0.2, ws=0.5, filter_type="butter")
+    test_linear_increment_rii_filter(fc=0.2, ws=0.5, filter_type="cheby1")
+    test_linear_increment_rii_filter(fc=0.2, ws=0.5, filter_type="cheby2")
+    test_linear_increment_rii_filter(fc=0.2, ws=0.5, filter_type="ellip")
+    # test_linear_increment_floating_average()
+    # test_linear_increment_fir_filter(filter_numtaps=3, input_errors=20)
+    # test_linear_increment_uppervalue_filter()
+    # test_linear_increment_median()
+    # test_step_increment_floating_average()
+    # test_step_increment_median()
     # test_step_increment_fir_filter()
