@@ -251,16 +251,18 @@ def test_linear_increment_fir_filter(input_length=1000, input_errors=100, fc=1, 
     buffer_array = []
     first_filtered_data = []
     second_filtered_data = []
+    third_filtered_data = []
 
     for input in input_data:
         print("========================")
-        push_to_data_array(input, buffer_array, (filter_numtaps*3+1))
-        if len(buffer_array) < (filter_numtaps*3+1):
+        push_to_data_array(input, buffer_array, (500))
+        if len(buffer_array) < (500):
             print(f"Loading Buffer")
             continue
         print(f"Valeur en entrée: {input}")
-        first_filtered_data = apply_fir_filter(buffer_array, fc, fs, filter_numtaps)
-        second_filtered_data = apply_fir_filter(first_filtered_data, 0.2, fs, filter_numtaps)
+        first_filtered_data = apply_fir_filter(buffer_array, 2, fs, filter_numtaps)
+        second_filtered_data = apply_fir_filter(first_filtered_data, 1, fs, filter_numtaps)
+        third_filtered_data = apply_fir_filter(second_filtered_data, 0.1, fs, filter_numtaps)
         print(f"Valeur en sortie: {first_filtered_data[-1]}")
     
     rmse = calculate_rmse(buffer_array, second_filtered_data)
@@ -269,17 +271,20 @@ def test_linear_increment_fir_filter(input_length=1000, input_errors=100, fc=1, 
     # Plotting the result
     plt.plot(buffer_array, label='Original Data')
     plt.plot(first_filtered_data, label='Filtered Once', linestyle='--')
-    plt.plot(second_filtered_data, label='Filtered Twice', linestyle='--')
-    plt.title("Valeur d'entrée vs valeur de sortie dans le buffer à la fin du test")
+    plt.plot(second_filtered_data, label='Filtered Twice', linestyle='-.')
+    plt.plot(third_filtered_data, label='Filtered 3 Times', linestyle='--')
+    plt.title("Valeur d'entrée vs valeur de sortie du filtre sur 500 échantillons")
     plt.xlabel('Sample')
     plt.ylabel('Amplitude')
     plt.legend()
     plt.show()
 
-def test_step_increment_fir_filter(input_length=1000, input_errors=100, fc=1, fs=8, filter_numtaps=101):
+def test_step_increment_fir_filter(input_length=1000, input_errors=100, fc=2, fs=8, filter_numtaps=101):
     step_signal = generate_step_increment()
     buffer_array = []
-    filtered_data = []
+    first_filtered_data = []
+    second_filtered_data = []
+    third_filtered_data = []
 
     for input in step_signal:
         print("========================")
@@ -288,15 +293,19 @@ def test_step_increment_fir_filter(input_length=1000, input_errors=100, fc=1, fs
             print(f"Loading Buffer")
             continue
         print(f"Valeur en entrée: {input}")
-        filtered_data = apply_fir_filter(buffer_array, fc, fs, filter_numtaps)
-        print(f"Valeur en sortie: {filtered_data[-1]}")
+        first_filtered_data = apply_fir_filter(buffer_array, fc, fs, filter_numtaps)
+        second_filtered_data = apply_fir_filter(first_filtered_data, 1, fs, filter_numtaps)
+        third_filtered_data = apply_fir_filter(second_filtered_data, 0.1, fs, filter_numtaps)
+        print(f"Valeur en sortie: {first_filtered_data[-1]}")
 
-    rmse = calculate_rmse(buffer_array, filtered_data)
+    rmse = calculate_rmse(buffer_array, first_filtered_data)
     print(f"rmse: {rmse}")
 
     # Plotting the result
     plt.plot(buffer_array, label='Original Data')
-    plt.plot(filtered_data, label='Filtered Data', linestyle='--')
+    plt.plot(first_filtered_data, label='Filtered Once', linestyle='--')
+    plt.plot(second_filtered_data, label='Filtered Twice', linestyle='--')
+    plt.plot(third_filtered_data, label='Filtered 3 Times', linestyle='--')
     plt.title("Valeur d'entrée vs valeur de sortie dans le buffer à la fin du test")
     plt.xlabel('Sample')
     plt.ylabel('Amplitude')
@@ -376,7 +385,8 @@ if __name__ == '__main__':
     # test_linear_increment_rii_filter(fc=0.2, ws=0.5, filter_type="cheby2")
     # test_linear_increment_rii_filter(fc=0.2, ws=0.5, filter_type="ellip")
     # test_linear_increment_floating_average()
-    test_linear_increment_fir_filter(filter_numtaps=101, input_errors=20)
+    # test_linear_increment_fir_filter(filter_numtaps=101, input_errors=20)
+    test_step_increment_fir_filter(filter_numtaps=101, input_errors=20)
     # test_linear_increment_uppervalue_filter()
     # test_linear_increment_median()
     # test_step_increment_floating_average()
