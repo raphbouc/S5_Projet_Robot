@@ -1,5 +1,5 @@
 from SunFounder_Line_Follower import Line_Follower
-import SunFounder_PiCar_S.example.line_follower as cali
+import line_follower as cali
 import time
 
 lf = Line_Follower.Line_Follower()
