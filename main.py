@@ -3,6 +3,8 @@ from websockets import serve
 # Correct imports based on module names and file structure
 import SunFounder_PiCar_S.example.SunFounder_Line_Follower.Line_Follower as LF
 import SunFounder_PiCar_S.example.line_follower as cali
+import picar
+
 
 async def send_status(websocket):
     # Initialize the line follower sensor
@@ -23,9 +25,10 @@ async def echo(websocket, path):
         await websocket.send(f"Message reçu : {message}")  # Echo received message for testing
 
 async def main():
-    #print("Starting Cali")
-    #cali.cali()  # Calibrate
-    #print("Ending Cali")
+    picar.setup()
+    print("Starting Cali")
+    cali.cali()  # Calibrate
+    print("Ending Cali")
     # Specify the host (localhost) and port (8765)
     async with serve(echo, "localhost", 8765):
         await asyncio.Future()  # Run server forever
