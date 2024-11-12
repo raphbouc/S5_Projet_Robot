@@ -7,7 +7,9 @@ import SunFounder_PiCar_S.example.line_follower as cali
 async def send_status(websocket):
     # Initialize the line follower sensor
     lf = LF.Line_Follower()  
+    print("Starting Cali")
     cali.cali()  # Calibrate
+    print("Ending Cali")
 
     while True:
         lt_status_now = lf.read_digital()  # Read current sensor status
