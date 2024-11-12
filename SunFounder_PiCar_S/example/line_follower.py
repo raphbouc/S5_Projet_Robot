@@ -11,7 +11,7 @@
 **********************************************************************
 '''
 
-from SunFounder_Line_Follower import Line_Follower
+from SunFounder_PiCar_S.example.SunFounder_Line_Follower import Line_Follower
 from picar import front_wheels
 from picar import back_wheels
 import time
