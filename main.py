@@ -42,6 +42,7 @@ async def echo(websocket, path):
     asyncio.create_task(send_status(websocket))
     async for message in websocket:
         await websocket.send(f"Message reçu : {message}")  # Echo received message
+        print(message)
 
 async def main():
     picar.setup()
