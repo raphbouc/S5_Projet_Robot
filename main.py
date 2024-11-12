@@ -7,10 +7,7 @@ import SunFounder_PiCar_S.example.line_follower as cali
 async def send_status(websocket):
     # Initialize the line follower sensor
     lf = LF.Line_Follower()  
-    print("Starting Cali")
-    cali.cali()  # Calibrate
-    print("Ending Cali")
-
+    
     while True:
         lt_status_now = lf.read_digital()  # Read current sensor status
         await websocket.send(str(lt_status_now))  # Send the status to Godot
@@ -26,6 +23,9 @@ async def echo(websocket, path):
         await websocket.send(f"Message reçu : {message}")  # Echo received message for testing
 
 async def main():
+    print("Starting Cali")
+    cali.cali()  # Calibrate
+    print("Ending Cali")
     # Specify the host (localhost) and port (8765)
     async with serve(echo, "localhost", 8765):
         await asyncio.Future()  # Run server forever
