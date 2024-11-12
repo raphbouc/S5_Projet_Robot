@@ -5,10 +5,13 @@ import SunFounder_PiCar_S.example.SunFounder_Line_Follower.Line_Follower as LF
 import SunFounder_PiCar_S.example.line_follower as cali
 import picar
 
+lf = LF.Line_Follower()  
+REFERENCES = [200, 200, 200, 200, 200]
+lf.references = REFERENCES
+
 
 async def send_status(websocket):
     # Initialize the line follower sensor
-    lf = LF.Line_Follower()  
     
     while True:
         lt_status_now = lf.read_digital()  # Read current sensor status
