@@ -72,6 +72,7 @@ def forward():
 	bw.forward()
 
 	while True :
+		print(lf.read_analog)
 		lt_status_now = lf.read_digital()
 		# Angle calculate
 		if	lt_status_now == [0,0,1,0,0]:
