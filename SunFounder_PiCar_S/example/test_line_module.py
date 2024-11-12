@@ -5,8 +5,9 @@ import time
 lf = Line_Follower.Line_Follower()
 
 previous = lf.read_analog()
+cali.cali()
+
 while True:
-	cali.cali()
 	current = lf.read_analog()
 	print("Previous : ", previous)
 	print("Current : ", current)
