@@ -1,30 +1,30 @@
 import asyncio
-from websockets.server import serve
-import SunFounder_PiCar_S.example.SunFounder_Line_Follower.Line_Follower as LineFollower
+from websockets import serve
+# Correct imports based on module names and file structure
+import SunFounder_PiCar_S.example.SunFounder_Line_Follower.Line_Follower as LF
 import SunFounder_PiCar_S.example.line_follower as cali
 
-
 async def send_status(websocket):
-    lf = LineFollower.Line_Follower()  # Initialise le capteur de suivi de ligne
-    cali.cali()  # Calibrage
+    # Initialize the line follower sensor
+    lf = LF.Line_Follower()  
+    cali.cali()  # Calibrate
 
     while True:
-        lt_status_now = lf.read_digital()  # Lit l'état actuel du capteur
-        await websocket.send(str(lt_status_now))  # Envoie lt_status_now à Godot
-        await asyncio.sleep(0.1)  # Attends 100 ms avant la prochaine lecture
+        lt_status_now = lf.read_digital()  # Read current sensor status
+        await websocket.send(str(lt_status_now))  # Send the status to Godot
+        await asyncio.sleep(0.1)  # Wait 100ms before next read
 
-
-async def echo(websocket):
-    # Lance une tâche asynchrone pour envoyer le statut en continu
+async def echo(websocket, path):
+    # Launch a background task to send status continuously
     asyncio.create_task(send_status(websocket))
 
-    # Gère les messages entrants s'il y a lieu
+    # Handle incoming messages
     async for message in websocket:
-        await websocket.send(f"Message reçu : {message}")  # Répond pour tester la connexion
-
+        await websocket.send(f"Message reçu : {message}")  # Echo received message for testing
 
 async def main():
-    async with serve(echo, None, 8765):
-        await asyncio.Future()  # run forever
+    # Specify the host (localhost) and port (8765)
+    async with serve(echo, "localhost", 8765):
+        await asyncio.Future()  # Run server forever
 
 asyncio.run(main())
