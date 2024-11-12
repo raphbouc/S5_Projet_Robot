@@ -1,10 +1,12 @@
 from SunFounder_Line_Follower import Line_Follower
+import line_follower
 import time
 
 lf = Line_Follower.Line_Follower()
 
 previous = lf.read_analog()
 while True:
+	line_follower.cali()
 	current = lf.read_analog()
 	print("Previous : ", previous)
 	print("Current : ", current)
