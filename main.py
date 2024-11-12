@@ -12,6 +12,7 @@ async def send_status(websocket):
     while True:
         lt_status_now = lf.read_digital()  # Read current sensor status
         await websocket.send(str(lt_status_now))  # Send the status to Godot
+        print(websocket.send(str(lt_status_now)))
         await asyncio.sleep(0.1)  # Wait 100ms before next read
 
 async def echo(websocket, path):
