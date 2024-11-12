@@ -35,13 +35,13 @@ async def send_status(websocket):
     while True:
         lt_status_now = lf.read_digital()  # Read current sensor status
         await websocket.send(str(lt_status_now))  # Send the status to Godot
+        print("Message envoyé : ", lt_status_now)
         await asyncio.sleep(0.1)  # Wait 100ms before next read
 
 async def echo(websocket, path):
     """Handle incoming messages and launch send_status task."""
     asyncio.create_task(send_status(websocket))
     async for message in websocket:
-        await websocket.send(f"Message reçu : {message}")  # Echo received message
         print(message)
 
 async def main():
