@@ -1,7 +1,5 @@
 import matplotlib.pyplot as plt
 import numpy as np
-from scipy import signal
-from typing import Literal
 
 
 def averaged_input(input, array):
