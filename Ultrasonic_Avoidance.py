@@ -12,7 +12,6 @@
 '''
 import time
 import RPi.GPIO as GPIO
-from filter import push_to_data_array, median_input
 
 value_array = []
 
@@ -26,6 +25,25 @@ class Ultrasonic_Avoidance(object):
 	def distance(self):
 	# 	Todo
 		pass
+
+def push_to_data_array(input, array, max_length):
+    if len(array) < max_length:
+        array.append(input)
+    else:
+        array.pop(0)
+        array.append(input)
+
+def median_input(array):
+    sorted_array = sorted(array)
+    n = len(sorted_array)
+    
+    # Calculer la médiane
+    if n % 2 == 0:  # Si le nombre d'éléments est pair
+        median = (sorted_array[n // 2 - 1] + sorted_array[n // 2]) / 2
+    else:  # Si le nombre d'éléments est impair
+        median = sorted_array[n // 2]
+        
+    return median
 
 def test():
 	UA = Ultrasonic_Avoidance(17)
