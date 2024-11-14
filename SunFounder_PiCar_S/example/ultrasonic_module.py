@@ -27,7 +27,7 @@ def median_input(array):
 
 def main():
 	distance = UA.get_distance()
-	push_to_data_array(distance, value_array)
+	push_to_data_array(distance, value_array, 10)
 	output_val = median_input(value_array)
 	status = UA.less_than(threshold)
 	if distance != -1:
