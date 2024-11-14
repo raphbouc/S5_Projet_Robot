@@ -12,6 +12,9 @@
 '''
 import time
 import RPi.GPIO as GPIO
+from filter import push_to_data_array, median_input
+
+value_array = []
 
 class Ultrasonic_Avoidance(object):
 	timeout = 0.0005
@@ -29,9 +32,12 @@ def test():
 	threshold = 10
 	while True:
 		distance = UA.get_distance()
+		push_to_data_array(distance, value_array)
+		output_val = median_input(value_array)
 		status = UA.less_than(threshold)
 		if distance != -1:
 			print('distance', distance, 'cm')
+			print(f"filtered distance {output_val}")
 			time.sleep(0.2)
 		else:
 			print(False)
