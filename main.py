@@ -1,7 +1,7 @@
 import asyncio
 from websockets import serve
 import SunFounder_PiCar_S.example.SunFounder_Line_Follower.Line_Follower as LF
-from SunFounder_PiCar_S.example.SunFounder_Ultrasonic_Avoidance.Ultrasonic_Avoidance import Ultrasonic_Avoidance
+import SunFounder_PiCar_S.example.SunFounder_Ultrasonic_Avoidance.Ultrasonic_Avoidance as UA
 import picar
 import json
 
@@ -9,7 +9,7 @@ import json
 lf = LF.Line_Follower()  
 REFERENCES = [200, 200, 200, 200, 200]
 lf.references = REFERENCES
-UA = Ultrasonic_Avoidance.Ultrasonic_Avoidance(20)
+Ultra_A = UA.Ultrasonic_Avoidance(20)
 threshold = 10
 value_array = []
 
@@ -58,7 +58,7 @@ async def calibrate():
 async def send_status(websocket):
     """Send line follower status to Godot."""
     while True:
-        distance = UA.get_distance()
+        distance = Ultra_A.get_distance()
         push_to_data_array(distance, value_array, 10)
         us_output = median_input(value_array)
         lt_status_now = lf.read_digital()  # Read current sensor status
