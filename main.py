@@ -6,7 +6,7 @@ import picar
 import SunFounder_PiCar.picar.back_wheels as back_wheels
 import SunFounder_PiCar.picar.front_wheels as front_wheels
 import json
-
+import time
 
 lf = LF.Line_Follower()  
 REFERENCES = [200, 200, 200, 200, 200]
@@ -88,11 +88,24 @@ async def echo(websocket, path):
     async for message in websocket:
         bw.speed = int(message)
         
+def destroy():
+	bw.stop()
+	fw.turn(90)
 
 async def main():
-    picar.setup()
-    await calibrate()  # Calibrate before starting the server
-    async with serve(echo, "localhost", 8765):
-        await asyncio.Future()  # Run server forever
+    try:
+        try: 
+            picar.setup()
+            await calibrate()  # Calibrate before starting the server
+            async with serve(echo, "localhost", 8765):
+                await asyncio.Future()  # Run server forever
+        except Exception as e:
+            print(e)
+            print('error try again in 5')
+            destroy()
+            time.sleep(5)
+    except KeyboardInterrupt:
+        destroy()
+            
 
 asyncio.run(main())
