@@ -3,6 +3,8 @@ from websockets import serve
 import SunFounder_PiCar_S.example.SunFounder_Line_Follower.Line_Follower as LF
 import SunFounder_PiCar_S.example.SunFounder_Ultrasonic_Avoidance.Ultrasonic_Avoidance as UA
 import picar
+import SunFounder_PiCar.picar.back_wheels as back_wheels
+import SunFounder_PiCar.picar.front_wheels as front_wheels
 import json
 
 
@@ -10,8 +12,15 @@ lf = LF.Line_Follower()
 REFERENCES = [200, 200, 200, 200, 200]
 lf.references = REFERENCES
 Ultra_A = UA.Ultrasonic_Avoidance(20)
+fw = front_wheels.Front_Wheels(db='config')
+bw = back_wheels.Back_Wheels(db='config')
 threshold = 10
 value_array = []
+
+fw.ready()
+bw.ready()
+fw.turning_max = 45
+
 
 def push_to_data_array(input, array, max_length):
     if len(array) < max_length:
@@ -71,14 +80,14 @@ async def send_status(websocket):
         json_message = json.dumps(message)
 
         await websocket.send(json_message)  # Send the status to Godot
-        print("Message envoyé : ", json_message)
         await asyncio.sleep(0.1)  # Wait 100ms before next read
 
 async def echo(websocket, path):
     """Handle incoming messages and launch send_status task."""
     asyncio.create_task(send_status(websocket))
     async for message in websocket:
-        print(message)
+        bw.speed = int(message)
+        
 
 async def main():
     picar.setup()
