@@ -64,6 +64,25 @@ async def calibrate():
 
     print("Calibration completed. References:", references)
 
+def process_message(json_message):
+    try:
+        # Convertir le JSON string en dictionnaire Python
+        data = json.loads(json_message)
+        
+        # Récupérer et arrondir les valeurs
+        speed = int(float(data.get("speed", 0)))  # Arrondir la vitesse
+        rotation = int(float(data.get("rotation", 0)))  # Arrondir la rotation
+        
+        # Limiter la rotation à 45 si nécessaire
+        if rotation > 45:
+            rotation = 45
+        
+        return speed, rotation
+    
+    except (ValueError, TypeError, json.JSONDecodeError) as e:
+        print(f"Erreur lors du traitement du message JSON : {e}")
+        return None
+
 async def send_status(websocket):
     """Send line follower status to Godot."""
     while True:
@@ -86,7 +105,9 @@ async def echo(websocket, path):
     """Handle incoming messages and launch send_status task."""
     asyncio.create_task(send_status(websocket))
     async for message in websocket:
-        bw.speed = int(message)
+        speed, rotation = process_message(message)
+        bw.speed = speed
+        fw.turn(rotation)
         
 def destroy():
 	bw.stop()
