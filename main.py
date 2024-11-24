@@ -106,7 +106,7 @@ async def echo(websocket, path):
     asyncio.create_task(send_status(websocket))
     async for message in websocket:
         speed, rotation = process_message(message)
-        bw.speed = speed
+        bw.speed = -10
         fw.turn(rotation)
         
 def destroy():
