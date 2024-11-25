@@ -16,8 +16,7 @@ fw = front_wheels.Front_Wheels(db='config')
 bw = back_wheels.Back_Wheels(db='config')
 threshold = 10
 value_array = []
-start_time = 0
-end_time = 0
+start_time = None  # Déclaration globale de start_time
 
 fw.ready()
 bw.ready()
@@ -113,20 +112,25 @@ async def send_status(websocket):
 
 async def echo(websocket, path):
     """Handle incoming messages and launch send_status task."""
-    end_time = time.time()
-    if start_time != None:
-        print(end_time - start_time)
+    global start_time  # Utilisation de la variable globale
+    if start_time is not None:  # Vérifier si start_time a été initialisé
+        end_time = time.time()
+        print(f"Time taken: {end_time - start_time} seconds")
+    else:
+        start_time = time.time()  # Initialisation de start_time si c'est la première fois
+
     asyncio.create_task(send_status(websocket))
-    start_time = time.time()
+    
     async for message in websocket:
         speed, rotation = process_message(message)
         bw.speed = speed
         fw.turn(rotation)
         print(speed, rotation)
+
         
 def destroy():
-	bw.stop()
-	fw.turn(90)
+    bw.stop()
+    fw.turn(90)
 
 async def main():
     try:
