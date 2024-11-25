@@ -77,7 +77,7 @@ def process_message(json_message):
         if rotation > 45:
             rotation = 45
         
-        return speed, rotation
+        return speed * 10, rotation
     
     except (ValueError, TypeError, json.JSONDecodeError) as e:
         print(f"Erreur lors du traitement du message JSON : {e}")
