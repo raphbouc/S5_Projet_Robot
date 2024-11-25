@@ -114,7 +114,8 @@ async def send_status(websocket):
 async def echo(websocket, path):
     """Handle incoming messages and launch send_status task."""
     end_time = time.time()
-    print(end_time-start_time)
+    if start_time != None:
+        print(end_time - start_time)
     asyncio.create_task(send_status(websocket))
     start_time = time.time()
     async for message in websocket:
