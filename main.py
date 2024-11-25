@@ -70,7 +70,7 @@ def process_message(json_message):
         data = json.loads(json_message)
         
         # Récupérer et arrondir les valeurs
-        speed = int(float(data.get("speed", 0)) * 200)  # Multiplier par 150
+        speed = int(float(data.get("speed", 0)) * 300)  # Multiplier par 150
         rotation = int(float(data.get("rotation", 0)) + 90)  # Arrondir la rotation
         
         # Limiter la rotation à 45 si nécessaire
@@ -104,8 +104,6 @@ async def send_status(websocket):
 
         await websocket.send(json.dumps(array_message))
 
-        await asyncio.sleep(0.1)  # Wait 100ms before next read
-
 async def echo(websocket, path):
     """Handle incoming messages and launch send_status task."""
     asyncio.create_task(send_status(websocket))
@@ -130,7 +128,6 @@ async def main():
             print(e)
             print('error try again in 5')
             destroy()
-            time.sleep(5)
     except KeyboardInterrupt:
         destroy()
             
