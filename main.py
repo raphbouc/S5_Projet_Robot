@@ -74,9 +74,12 @@ def process_message(json_message):
         rotation = int(float(data.get("rotation", 0)) + 90)  # Arrondir la rotation
         
         # Limiter la rotation à 45 si nécessaire
-        if rotation > 45:
+        if rotation < 45:
             rotation = 45
-        
+        elif rotation > 135:
+            rotation = 135
+        else : 
+            rotation = rotation
         return speed, rotation
     
     except (ValueError, TypeError, json.JSONDecodeError) as e:
