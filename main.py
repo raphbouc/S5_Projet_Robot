@@ -92,6 +92,7 @@ def process_message(json_message):
 async def send_status(websocket):
     """Send line follower status to Godot."""
     while True:
+        start_time = time.time()  # Temps avant l'envoi
         distance = Ultra_A.get_distance()
         push_to_data_array(distance, value_array, 10)
         us_output = median_input(value_array)
@@ -104,6 +105,12 @@ async def send_status(websocket):
         array_message.append(lt_status_now[3])
         array_message.append(lt_status_now[4])
         array_message.append(us_output)
+        # Temps après l'envoi
+        end_time = time.time()  # Temps après l'envoi
+        
+        # Calculer le temps écoulé entre les envois
+        elapsed_time = end_time - start_time
+        print(f"Temps écoulé entre les envois : {elapsed_time:.4f} secondes")
 
         await websocket.send(json.dumps(array_message))
 
