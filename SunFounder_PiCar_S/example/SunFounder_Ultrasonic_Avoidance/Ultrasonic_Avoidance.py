@@ -12,7 +12,7 @@ class Ultrasonic_Avoidance(object):
         # Configuration de la broche en mode sortie avant d'envoyer le signal
         GPIO.setup(self.channel, GPIO.OUT)
         GPIO.output(self.channel, False)
-        time.sleep(0.01)  # Pause pour stabiliser le signal
+        time.sleep(0.005)  # Réduit le délai de stabilisation à 5ms
         GPIO.output(self.channel, True)
         time.sleep(0.00001)  # Pulse de 10 microsecondes
         GPIO.output(self.channel, False)
@@ -76,7 +76,7 @@ def test():
         else:
             print("Read distance error.")
         
-        time.sleep(0.1)  # Réduction du délai pour augmenter la réactivité
+        time.sleep(0.05)  # Réduit à 50ms pour rendre la boucle encore plus réactive
 
 if __name__ == '__main__':
     test()
