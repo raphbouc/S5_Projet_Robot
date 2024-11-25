@@ -104,7 +104,7 @@ async def send_status(websocket):
 
         await websocket.send(json.dumps(array_message))
 
-        await asyncio.sleep(0.1)  # Wait 100ms before next read
+        await asyncio.sleep(0.01)  # Wait 100ms before next read
 
 async def echo(websocket, path):
     """Handle incoming messages and launch send_status task."""
