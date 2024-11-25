@@ -114,7 +114,13 @@ async def echo(websocket, path):
     asyncio.create_task(send_status(websocket))
     async for message in websocket:
         speed, rotation = process_message(message)
-        bw.speed = speed
+        if (speed < 0):
+            bw.backward()
+            speed = speed/-1
+            bw.speed = speed
+        if (speed > 0):
+            bw.forward()
+            bw.speed = speed
         fw.turn(rotation)
         print(speed, rotation)
         
