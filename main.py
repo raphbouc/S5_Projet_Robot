@@ -44,7 +44,6 @@ def median_input(array):
 async def calibrate():
     """Calibrate the line follower sensor."""
     print("Starting calibration")
-    await asyncio.sleep(10)
     references = [0, 0, 0, 0, 0]
     mount = 100  # Number of measurements for average calculation
 
@@ -135,7 +134,6 @@ async def main():
         try: 
             picar.setup()
             await calibrate()  # Calibrate before starting the server
-            await asyncio.sleep(10)
             async with serve(echo, "localhost", 8765):
                 await asyncio.Future()  # Run server forever
         except Exception as e:
