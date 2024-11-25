@@ -99,8 +99,8 @@ async def send_status(websocket):
         array_message.append(lt_status_now[4])
         array_message.append(us_output)
         
+        await websocket.send(json.dumps(array_message))
 
-        await websocket.send(array_message)  # Send the status to Godot
         await asyncio.sleep(0.1)  # Wait 100ms before next read
 
 async def echo(websocket, path):
