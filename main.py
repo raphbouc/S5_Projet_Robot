@@ -104,6 +104,8 @@ async def send_status(websocket):
 
         await websocket.send(json.dumps(array_message))
 
+        await asyncio.sleep(0.1)  # Wait 100ms before next read
+
 async def echo(websocket, path):
     """Handle incoming messages and launch send_status task."""
     asyncio.create_task(send_status(websocket))
@@ -128,6 +130,7 @@ async def main():
             print(e)
             print('error try again in 5')
             destroy()
+            time.sleep(5)
     except KeyboardInterrupt:
         destroy()
             
