@@ -111,12 +111,16 @@ async def send_status(websocket):
 
 async def echo(websocket, path):
     """Handle incoming messages and launch send_status task."""
+    time_s = time.start()
     asyncio.create_task(send_status(websocket))
     async for message in websocket:
         speed, rotation = process_message(message)
         bw.speed = speed
         fw.turn(rotation)
         print(speed, rotation)
+    time_e = time.end()
+    total = time_e -time_s 
+    print(total)
         
 def destroy():
 	bw.stop()
