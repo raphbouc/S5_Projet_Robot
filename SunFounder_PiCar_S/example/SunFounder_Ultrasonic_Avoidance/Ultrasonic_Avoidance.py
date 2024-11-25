@@ -67,14 +67,14 @@ def test():
         if distance != -1:
             print(f'distance: {distance} cm')
         else:
-            print('Read distance error.')
+            print('Read distance error. 1')
 
         if status == 1:
             print(f"Less than {threshold}")
         elif status == 0:
             print(f"Over {threshold}")
         else:
-            print("Read distance error.")
+            print("Read distance error. 2")
         
         time.sleep(0.05)  # Réduit à 50ms pour rendre la boucle encore plus réactive
 

@@ -92,7 +92,7 @@ async def send_status(websocket):
     """Send line follower status to Godot."""
     while True:
         distance = Ultra_A.get_distance()
-        #push_to_data_array(distance, value_array, 10)
+        push_to_data_array(distance, value_array, 10)
         us_output = distance
         lt_status_now = lf.read_digital()  # Read current sensor status
         
