@@ -91,14 +91,16 @@ async def send_status(websocket):
         us_output = median_input(value_array)
         lt_status_now = lf.read_digital()  # Read current sensor status
         
-        message = {
-            "lt_status": lt_status_now,
-            "us_output": us_output
-        }
+        array_message = []
+        array_message.append(lt_status_now[0])
+        array_message.append(lt_status_now[1])
+        array_message.append(lt_status_now[2])
+        array_message.append(lt_status_now[3])
+        array_message.append(lt_status_now[4])
+        array_message.append(us_output)
+        
 
-        json_message = json.dumps(message)
-
-        await websocket.send(json_message)  # Send the status to Godot
+        await websocket.send(array_message)  # Send the status to Godot
         await asyncio.sleep(0.1)  # Wait 100ms before next read
 
 async def echo(websocket, path):
