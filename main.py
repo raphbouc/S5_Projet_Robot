@@ -44,7 +44,7 @@ def median_input(array):
 async def calibrate():
     """Calibrate the line follower sensor."""
     print("Starting calibration")
-    asyncio.sleep(30)
+    asyncio.sleep(10)
     references = [0, 0, 0, 0, 0]
     mount = 100  # Number of measurements for average calculation
 
