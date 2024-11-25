@@ -70,14 +70,14 @@ def process_message(json_message):
         data = json.loads(json_message)
         
         # Récupérer et arrondir les valeurs
-        speed = int(float(data.get("speed", 0)))  # Arrondir la vitesse
-        rotation = int(float(data.get("rotation", 0)))  # Arrondir la rotation
+        speed = int(float(data.get("speed", 0)) * 150)  # Multiplier par 150
+        rotation = int(float(data.get("rotation", 0)) * 150)  # Arrondir la rotation
         
         # Limiter la rotation à 45 si nécessaire
         if rotation > 45:
             rotation = 45
         
-        return speed * 150, rotation
+        return speed, rotation
     
     except (ValueError, TypeError, json.JSONDecodeError) as e:
         print(f"Erreur lors du traitement du message JSON : {e}")
