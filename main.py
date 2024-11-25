@@ -108,6 +108,7 @@ async def echo(websocket, path):
         speed, rotation = process_message(message)
         bw.speed = speed
         fw.turn(rotation)
+        print(message)
         
 def destroy():
 	bw.stop()
