@@ -16,6 +16,8 @@ fw = front_wheels.Front_Wheels(db='config')
 bw = back_wheels.Back_Wheels(db='config')
 threshold = 10
 value_array = []
+start_time = 0
+end_time = 0
 
 fw.ready()
 bw.ready()
@@ -111,16 +113,15 @@ async def send_status(websocket):
 
 async def echo(websocket, path):
     """Handle incoming messages and launch send_status task."""
-    time_s = time.time()
+    end_time = time.time()
+    print(end_time-start_time)
     asyncio.create_task(send_status(websocket))
+    start_time = time.time()
     async for message in websocket:
         speed, rotation = process_message(message)
         bw.speed = speed
         fw.turn(rotation)
         print(speed, rotation)
-    time_e = time.time()
-    total = time_e -time_s 
-    print(total)
         
 def destroy():
 	bw.stop()
