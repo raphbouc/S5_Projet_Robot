@@ -72,7 +72,7 @@ def process_message(json_message):
         data = json.loads(json_message)
         
         # Récupérer et arrondir les valeurs
-        speed = int(float(data.get("speed", 0)) * 500)  # Multiplier par 150
+        speed = int(float(data.get("speed", 0)) * 300)  # Multiplier par 150
         rotation = int(float(data.get("rotation", 0)) + 90)  # Arrondir la rotation
         
         # Limiter la rotation à 45 si nécessaire
