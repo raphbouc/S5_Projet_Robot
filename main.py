@@ -115,12 +115,13 @@ async def echo(websocket, path):
     async for message in websocket:
         speed, rotation = process_message(message)
         if (speed < 0):
+            bw.stop()
             speed = speed/-1
             bw.speed = speed
             bw.backward()
-            print('Im HERE')
 
         if (speed > 0):
+            bw.stop()
             bw.speed = speed
             bw.forward()
         fw.turn(rotation)
