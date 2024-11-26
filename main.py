@@ -9,7 +9,7 @@ import json
 import time
 
 lf = LF.Line_Follower()  
-REFERENCES = [200, 200, 200, 200, 200]
+REFERENCES = [56.0, 71.0, 70.0, 78.5, 51.5]
 lf.references = REFERENCES
 Ultra_A = UA.Ultrasonic_Avoidance(20)
 fw = front_wheels.Front_Wheels(db='config')
@@ -133,7 +133,7 @@ async def main():
     try:
         try: 
             picar.setup()
-            await calibrate()  # Calibrate before starting the server
+            #await calibrate()  # Calibrate before starting the server
             async with serve(echo, "localhost", 8765):
                 await asyncio.Future()  # Run server forever
         except Exception as e:
