@@ -133,7 +133,7 @@ async def main():
     try:
         try: 
             picar.setup()
-            #await calibrate()  # Calibrate before starting the server
+            await calibrate()  # Calibrate before starting the server
             async with serve(echo, "localhost", 8765):
                 await asyncio.Future()  # Run server forever
         except Exception as e:
