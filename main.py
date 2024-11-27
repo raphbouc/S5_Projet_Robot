@@ -92,7 +92,7 @@ async def send_status(websocket):
     """Send line follower status to Godot."""
     while True:
         distance = Ultra_A.get_distance()
-        push_to_data_array(distance, value_array, 10)
+        push_to_data_array(distance, value_array, 5)
         us_output = median_input(value_array)
         lt_status_now = lf.read_digital()  # Read current sensor status
         
@@ -133,7 +133,7 @@ async def main():
     try:
         try: 
             picar.setup()
-            #await calibrate()  # Calibrate before starting the server
+            await calibrate()  # Calibrate before starting the server
             async with serve(echo, "localhost", 8765):
                 await asyncio.Future()  # Run server forever
         except Exception as e:
