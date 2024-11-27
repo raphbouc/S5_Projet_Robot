@@ -15,7 +15,7 @@ Ultra_A = UA.Ultrasonic_Avoidance(20)
 fw = front_wheels.Front_Wheels(db='config')
 bw = back_wheels.Back_Wheels(db='config')
 threshold = 10
-value_array = []
+value_array = [-1,-1,-1]
 
 fw.ready()
 bw.ready()
