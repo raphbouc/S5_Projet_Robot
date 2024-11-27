@@ -40,7 +40,7 @@ class Ultrasonic_Avoidance(object):
             distance = pulse_duration * 34300 / 2  # Calcul de la distance en cm (vitesse du son)
             return int(distance)
         else:
-            return 1000  # En cas d'erreur dans la mesure
+            return -1  # En cas d'erreur dans la mesure
 
     def get_distance(self, mount=3):  # Réduction du nombre de mesures
         total_distance = 0
