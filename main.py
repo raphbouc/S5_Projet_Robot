@@ -106,6 +106,7 @@ async def send_status(websocket):
         # Temps après l'envoi
         
         await websocket.send(json.dumps(array_message))
+        print(array_message)
 
         await asyncio.sleep(0.2)  # Wait 100ms before next read
 
@@ -118,7 +119,6 @@ async def echo(websocket, path):
             speed = speed/-1
             bw.speed = speed
             bw.backward()
-
         elif (speed > 0):
             bw.speed = speed
             bw.forward()
