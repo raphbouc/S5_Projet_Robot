@@ -24,7 +24,8 @@ fw.turning_max = 45
 
 def push_to_data_array(input, array, max_length):
     if len(array) < max_length:
-        array.append(input)
+        if input < 70:
+            array.append(input)
     else:
         array.pop(0)
         array.append(input)
@@ -93,7 +94,7 @@ async def send_status(websocket):
     while True:
         distance = Ultra_A.get_distance()
         print(f"measured distance {distance}")
-        push_to_data_array(distance, value_array, 5)
+        push_to_data_array(distance, value_array, 3)
         print(f"value array: {value_array}")
         us_output = median_input(value_array)
         print(f"output de la mediane: {us_output}")
