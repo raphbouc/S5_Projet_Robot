@@ -23,12 +23,11 @@ fw.turning_max = 45
 
 
 def push_to_data_array(input, array, max_length):
-    if input < 70 :
-        if len(array) < max_length:
-            array.append(input)
-        else:
-            array.pop(0)
-            array.append(input)
+    if len(array) < max_length:
+        array.append(input)
+    else:
+        array.pop(0)
+        array.append(input)
 
 def median_input(array):
     sorted_array = sorted(array)
