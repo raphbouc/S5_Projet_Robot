@@ -94,7 +94,7 @@ async def send_status(websocket):
     while True:
         distance = Ultra_A.get_distance()
         push_to_data_array(distance, value_array, 10)
-        us_output = distance
+        us_output = median_input(value_array)
         lt_status_now = lf.read_digital()  # Read current sensor status
         
         array_message = []
