@@ -50,7 +50,7 @@ async def update_distance():
     """Tâche dédiée pour lire les distances et calculer la médiane."""
     global value_array, us_output
     while True:
-        distance = Ultra_A.get_distance()
+        distance = Ultra_A.get_distance() -2
         print("distance", distance)
         # Utilisation du verrou pour mettre à jour value_array
         async with value_array_lock:
