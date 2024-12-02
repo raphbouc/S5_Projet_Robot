@@ -14,13 +14,13 @@ lf.references = REFERENCES
 Ultra_A = UA.Ultrasonic_Avoidance(20)
 fw = front_wheels.Front_Wheels(db='config')
 bw = back_wheels.Back_Wheels(db='config')
-threshold = 10
-value_array = [-1,-1,-1, -1, -1]
 
 fw.ready()
 bw.ready()
 fw.turning_max = 45
 
+value_array = [-1, -1, -1, -1, -1]  # Partagé, mais pas besoin de verrou
+us_output = -1  # Stocke la médiane calculée
 
 def push_to_data_array(input, array, max_length):
     if len(array) < max_length:
@@ -33,15 +33,21 @@ def push_to_data_array(input, array, max_length):
 def median_input(array):
     sorted_array = sorted(array)
     n = len(sorted_array)
-    
-    # Calculer la médiane
-    if n % 2 == 0:  # Si le nombre d'éléments est pair
+    if n % 2 == 0:  # Si pair
         median = (sorted_array[n // 2 - 1] + sorted_array[n // 2]) / 2
-    else:  # Si le nombre d'éléments est impair
+    else:  # Si impair
         median = sorted_array[n // 2]
-        
     return median
 
+async def update_distance():
+    """Tâche dédiée pour lire les distances et calculer la médiane."""
+    global value_array, us_output
+    while True:
+        distance = Ultra_A.get_distance()
+        push_to_data_array(distance, value_array, 5)
+        us_output = median_input(value_array)  # Calcul de la médiane
+        await asyncio.sleep(0.1)  # Lecture toutes les 100ms
+        
 async def calibrate():
     """Calibrate the line follower sensor."""
     print("Starting calibration")
@@ -69,126 +75,93 @@ async def calibrate():
     print("Calibration completed. References:", references)
 
 
-def process_message(json_message):
-    try:
-        # Convertir le JSON string en dictionnaire Python
-        data = json.loads(json_message)
-        
-        # Récupérer et arrondir les valeurs
-        speed = int(float(data.get("speed", 0)) * 300)  # Multiplier par 150
-        rotation = int(float(data.get("rotation", 0)) + 90)  # Arrondir la rotation
-        
-        # Limiter la rotation à 45 si nécessaire
-        if rotation < 45:
-            rotation = 45
-        elif rotation > 135:
-            rotation = 135
-        else : 
-            rotation = rotation
-        return speed, rotation
-    
-    except (ValueError, TypeError, json.JSONDecodeError) as e:
-        print(f"Erreur lors du traitement du message JSON : {e}")
-        return None
-
 async def send_status(websocket):
-    """Send line follower status to Godot."""
+    """Envoie les données du suiveur de ligne et de la distance."""
+    global us_output
     distance_state = 1
     startTime = None
     while True:
-        distance = Ultra_A.get_distance()
-        # print(f"measured distance {distance}")
-        push_to_data_array(distance, value_array, 5)
-        #print(f"value array: {value_array}")
-        if distance_state <= 5:
-            us_output = median_input(value_array)
-            print("us_output", us_output)
-            print("median complet", value_array)
-        else: 
-            us_output = -1
-        # print(f"output de la mediane: {us_output}")
-        lt_status_now = lf.read_digital()  # Read current sensor status
-        
-        array_message = []
-        array_message.append(lt_status_now[0])
-        array_message.append(lt_status_now[1])
-        array_message.append(lt_status_now[2])
-        array_message.append(lt_status_now[3])
-        array_message.append(lt_status_now[4])
-        elapsed_time = 0
-        if startTime != None:
-            elapsed_time = time.time() - startTime
-            print(f"elapsed_time right now is {elapsed_time}")
+        lt_status_now = lf.read_digital()  # Lecture des capteurs de ligne
 
+        array_message = lt_status_now.copy()
+        elapsed_time = 0
+        if startTime:
+            elapsed_time = time.time() - startTime
+            print(f"Elapsed time: {elapsed_time}")
+
+        # Logique d'état basée sur `us_output`
         if us_output > 0:
             if us_output < 34 and distance_state == 1:
                 distance_state = 2
-                print("in state 2")
+                print("In state 2")
             elif us_output < 14 and distance_state == 2:
                 distance_state = 3
-                print("in state 3")
+                print("In state 3")
             elif us_output > 28 and distance_state == 3:
                 distance_state = 4
                 startTime = time.time()
-                elapsed_time = 0
-                print("first timer starteds in state 4")
+                print("First timer started in state 4")
         if elapsed_time > 4.25 and distance_state == 4:
             distance_state = 5
             startTime = time.time()
-            elapsed_time = 0
-            print("second timer started in state 5")
+            print("Second timer started in state 5")
         elif elapsed_time > 3 and distance_state == 5:
             distance_state = 6
             startTime = time.time()
-            elapsed_time = 0
-            print("in state 6")
-        elif elapsed_time >  2 and distance_state == 6:
+            print("In state 6")
+        elif elapsed_time > 2 and distance_state == 6:
             distance_state = 7
-            print("in state 7")
+            print("In state 7")
         elif sum(lt_status_now) >= 1 and distance_state == 7:
             distance_state = 1
-            print("back to state 1")
+            print("Back to state 1")
 
         array_message.append(distance_state)
         await websocket.send(json.dumps(array_message))
         print(array_message)
-
-        await asyncio.sleep(0.2)  # Wait 100ms before next read
+        await asyncio.sleep(0.2)  # Pause entre les envois
 
 async def echo(websocket, path):
-    """Handle incoming messages and launch send_status task."""
+    """Gère les messages entrants et lance `send_status`."""
     asyncio.create_task(send_status(websocket))
     async for message in websocket:
         speed, rotation = process_message(message)
-        if (speed < 0):
-            speed = speed/-1
+        if speed < 0:
             bw.speed = speed
             bw.backward()
-        elif (speed > 0):
+        else:
             bw.speed = speed
             bw.forward()
         fw.turn(rotation)
-        print(f"speed is {speed}, rotation is {rotation}")
-        
+        print(f"Speed: {speed}, Rotation: {rotation}")
+
+def process_message(json_message):
+    try:
+        data = json.loads(json_message)
+        speed = int(float(data.get("speed", 0)) * 300)
+        rotation = int(float(data.get("rotation", 0)) + 90)
+        rotation = max(45, min(rotation, 135))
+        return speed, rotation
+    except Exception as e:
+        print(f"Error processing message: {e}")
+        return None
+
 def destroy():
-	bw.stop()
-	fw.turn(90)
-    
+    bw.stop()
+    fw.turn(90)
 
 async def main():
     try:
-        try: 
-            picar.setup()
-            await calibrate()  # Calibrate before starting the server
-            async with serve(echo, "localhost", 8765):
-                await asyncio.Future()  # Run server forever
-        except Exception as e:
-            print(e)
-            print('error try again in 5')
-            destroy()
-            time.sleep(5)
+        picar.setup()
+        await calibrate()
+        asyncio.create_task(update_distance())  # Démarre la tâche async
+        async with serve(echo, "localhost", 8765):
+            await asyncio.Future()  # Garder le serveur actif
     except KeyboardInterrupt:
         destroy()
+
+asyncio.run(main())
+
             
 
 asyncio.run(main())
