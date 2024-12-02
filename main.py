@@ -51,7 +51,7 @@ async def update_distance():
     global value_array, us_output
     while True:
         distance = Ultra_A.get_distance()
-
+        print("distance", distance)
         # Utilisation du verrou pour mettre à jour value_array
         async with value_array_lock:
             push_to_data_array(distance, value_array, 5)
