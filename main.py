@@ -54,12 +54,13 @@ async def update_distance():
         print("distance", distance)
         # Utilisation du verrou pour mettre à jour value_array
         async with value_array_lock:
-            push_to_data_array(distance, value_array, 5)
+            if distance != -1:
+                push_to_data_array(distance, value_array, 5)
             local_value_array = value_array.copy()
 
         # Calcul de la médiane sous verrou
         async with us_output_lock:
-            us_output = median_input(local_value_array) + 1
+            us_output = median_input(local_value_array)
 
         await asyncio.sleep(0.1)  # Lecture toutes les 100ms
 
@@ -92,7 +93,7 @@ async def calibrate():
 
 async def send_status(websocket):
     """Envoie les données du suiveur de ligne et de la distance."""
-    global us_output
+    global us_output, value_array
     distance_state = 1
     startTime = None
     while True:
@@ -133,10 +134,10 @@ async def send_status(websocket):
             print("In state 6")
         elif elapsed_time > 2 and distance_state == 6:
             distance_state = 7
-            value_array = [-1, -1, -1, -1, -1]
             print("In state 7")
         elif sum(lt_status_now) >= 1 and distance_state == 7:
             distance_state = 1
+            value_array = [-1, -1, -1, -1, -1]
             print("Back to state 1")
 
         array_message.append(distance_state)
