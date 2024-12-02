@@ -19,7 +19,7 @@ fw.ready()
 bw.ready()
 fw.turning_max = 45
 
-value_array = [-1, -1, -1, -1, -1, -1, -1, -1, -1]  # Partagé
+value_array = [-1, -1, -1, -1, -1]  # Partagé
 us_output = -1  # Stocke la médiane calculée
 
 # Création d'un verrou pour synchroniser l'accès aux variables partagées
@@ -54,7 +54,7 @@ async def update_distance():
         print("distance", distance)
         # Utilisation du verrou pour mettre à jour value_array
         async with value_array_lock:
-            push_to_data_array(distance, value_array, 9)
+            push_to_data_array(distance, value_array, 5)
             local_value_array = value_array.copy()
 
         # Calcul de la médiane sous verrou
@@ -109,14 +109,14 @@ async def send_status(websocket):
             local_us_output = us_output
 
         # Logique d'état basée sur `us_output`
-        if local_us_output > 0:
-            if local_us_output < 34 and distance_state == 1:
+        if median_input(local_us_output) > 0:
+            if median_input(local_us_output) < 34 and distance_state == 1:
                 distance_state = 2
                 print("In state 2")
-            elif local_us_output < 14 and distance_state == 2:
+            elif median_input(local_us_output) < 14 and distance_state == 2:
                 distance_state = 3
                 print("In state 3")
-            elif local_us_output > 28 and distance_state == 3:
+            elif median_input(local_us_output) > 28 and distance_state == 3:
                 distance_state = 4
                 startTime = time.time()
                 elapsed_time = 0
