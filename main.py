@@ -109,14 +109,14 @@ async def send_status(websocket):
             local_us_output = us_output
 
         # Logique d'état basée sur `us_output`
-        if median_input(local_us_output) > 0:
-            if median_input(local_us_output) < 34 and distance_state == 1:
+        if local_us_output > 0:
+            if local_us_output < 34 and distance_state == 1:
                 distance_state = 2
                 print("In state 2")
-            elif median_input(local_us_output) < 14 and distance_state == 2:
+            elif local_us_output < 14 and distance_state == 2:
                 distance_state = 3
                 print("In state 3")
-            elif median_input(local_us_output) > 28 and distance_state == 3:
+            elif local_us_output > 28 and distance_state == 3:
                 distance_state = 4
                 startTime = time.time()
                 elapsed_time = 0
