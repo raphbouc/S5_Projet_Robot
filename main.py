@@ -173,6 +173,7 @@ async def echo(websocket, path):
 def destroy():
 	bw.stop()
 	fw.turn(90)
+    
 
 async def main():
     try:
