@@ -59,7 +59,7 @@ async def update_distance():
 
         # Calcul de la médiane sous verrou
         async with us_output_lock:
-            us_output = median_input(local_value_array)
+            us_output = median_input(local_value_array) + 1
 
         await asyncio.sleep(0.1)  # Lecture toutes les 100ms
 
