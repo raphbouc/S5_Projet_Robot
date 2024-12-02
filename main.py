@@ -119,13 +119,16 @@ async def send_status(websocket):
             elif local_us_output > 28 and distance_state == 3:
                 distance_state = 4
                 startTime = time.time()
+                elapsed_time = 0
                 print("First timer started in state 4")
         if elapsed_time > 4.25 and distance_state == 4:
             distance_state = 5
+            elapsed_time = 0
             startTime = time.time()
             print("Second timer started in state 5")
         elif elapsed_time > 3 and distance_state == 5:
             distance_state = 6
+            elapsed_time = 0
             startTime = time.time()
             print("In state 6")
         elif elapsed_time > 2 and distance_state == 6:
@@ -137,7 +140,6 @@ async def send_status(websocket):
 
         array_message.append(distance_state)
         await websocket.send(json.dumps(array_message))
-        print(array_message)
         await asyncio.sleep(0.2)  # Pause entre les envois
 
 
