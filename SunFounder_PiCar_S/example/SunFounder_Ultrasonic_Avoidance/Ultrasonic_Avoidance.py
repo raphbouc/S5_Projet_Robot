@@ -2,7 +2,7 @@ import time
 import RPi.GPIO as GPIO
 
 class Ultrasonic_Avoidance(object):
-    timeout = 0.005
+    timeout = 0.05
 
     def __init__(self, channel):
         self.channel = channel
