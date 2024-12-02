@@ -15,7 +15,7 @@ Ultra_A = UA.Ultrasonic_Avoidance(20)
 fw = front_wheels.Front_Wheels(db='config')
 bw = back_wheels.Back_Wheels(db='config')
 threshold = 10
-value_array = [-1,-1,-1]
+value_array = [-1,-1,-1, -1, -1]
 
 fw.ready()
 bw.ready()
@@ -98,9 +98,9 @@ async def send_status(websocket):
     while True:
         distance = Ultra_A.get_distance()
         # print(f"measured distance {distance}")
-        push_to_data_array(distance, value_array, 3)
+        push_to_data_array(distance, value_array, 5)
         #print(f"value array: {value_array}")
-        if distance_state <= 3:
+        if distance_state <= 5:
             us_output = median_input(value_array)
         else: 
             us_output = -1
