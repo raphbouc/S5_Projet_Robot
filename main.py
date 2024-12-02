@@ -46,26 +46,28 @@ async def calibrate():
     """Calibrate the line follower sensor."""
     print("Starting calibration")
     references = [0, 0, 0, 0, 0]
-    mount = 100  # Number of measurements for average calculation
+    num_measurements = 5  # Number of measurements to average
 
     # White calibration
     print("Place sensors on white surface...")
     fw.turn(0)
     await asyncio.sleep(4)  # Give some time to place the sensors
-    white_references = lf.get_average(mount)
+    white_values = [lf.get_average(100) for _ in range(num_measurements)]
+    white_references = [sum(values) / num_measurements for values in zip(*white_values)]
 
-    fw.turn(90)
     # Black calibration
     print("Place sensors on black surface...")
+    fw.turn(90)
     await asyncio.sleep(4)  # Give some time to place the sensors
-    black_references = lf.get_average(mount)
+    black_values = [lf.get_average(100) for _ in range(num_measurements)]
+    black_references = [sum(values) / num_measurements for values in zip(*black_values)]
 
     # Calculate middle references
-    for i in range(5):
-        references[i] = (white_references[i] + black_references[i]) / 2
+    references = [(w + b) / 2 for w, b in zip(white_references, black_references)]
     lf.references = references
 
     print("Calibration completed. References:", references)
+
 
 def process_message(json_message):
     try:
@@ -91,13 +93,18 @@ def process_message(json_message):
 
 async def send_status(websocket):
     """Send line follower status to Godot."""
+    distance_state = 1
+    startTime = None
     while True:
         distance = Ultra_A.get_distance()
-        print(f"measured distance {distance}")
+        # print(f"measured distance {distance}")
         push_to_data_array(distance, value_array, 3)
-        print(f"value array: {value_array}")
-        us_output = median_input(value_array)
-        print(f"output de la mediane: {us_output}")
+        #print(f"value array: {value_array}")
+        if distance_state <= 3:
+            us_output = median_input(value_array)
+        else: 
+            us_output = -1
+        # print(f"output de la mediane: {us_output}")
         lt_status_now = lf.read_digital()  # Read current sensor status
         
         array_message = []
@@ -106,9 +113,41 @@ async def send_status(websocket):
         array_message.append(lt_status_now[2])
         array_message.append(lt_status_now[3])
         array_message.append(lt_status_now[4])
-        array_message.append(us_output)
-        # Temps après l'envoi
-        
+        elapsed_time = 0
+        if startTime != None:
+            elapsed_time = time.time() - startTime
+            print(f"elapsed_time right noew is {elapsed_time}")
+
+        if us_output > 0:
+            if us_output < 34 and distance_state == 1:
+                distance_state = 2
+                print("in state 2")
+            elif us_output < 14 and distance_state == 2:
+                distance_state = 3
+                print("in state 3")
+            elif us_output > 28 and distance_state == 3:
+                distance_state = 4
+                startTime = time.time()
+                elapsed_time = 0
+                print("first timer starteds in state 4")
+        if elapsed_time > 4.25 and distance_state == 4:
+            distance_state = 5
+            startTime = time.time()
+            elapsed_time = 0
+            print("second timer started in state 5")
+        elif elapsed_time > 3 and distance_state == 5:
+            distance_state = 6
+            startTime = time.time()
+            elapsed_time = 0
+            print("in state 6")
+        elif elapsed_time >  2 and distance_state == 6:
+            distance_state = 7
+            print("in state 7")
+        elif sum(lt_status_now) >= 1 and distance_state == 7:
+            distance_state = 1
+            print("back to state 1")
+
+        array_message.append(distance_state)
         await websocket.send(json.dumps(array_message))
         print(array_message)
 
@@ -127,7 +166,7 @@ async def echo(websocket, path):
             bw.speed = speed
             bw.forward()
         fw.turn(rotation)
-        print(speed, rotation)
+        print(f"speed is {speed}, rotation is {rotation}")
         
 def destroy():
 	bw.stop()
