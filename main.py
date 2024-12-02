@@ -8,7 +8,7 @@ import SunFounder_PiCar.picar.front_wheels as front_wheels
 import json
 import time
 
-lf = LF.Line_Follower()  
+lf = LF.Line_Follower()
 REFERENCES = [56.0, 71.0, 70.0, 78.5, 51.5]
 lf.references = REFERENCES
 Ultra_A = UA.Ultrasonic_Avoidance(20)
@@ -19,8 +19,13 @@ fw.ready()
 bw.ready()
 fw.turning_max = 45
 
-value_array = [-1, -1, -1, -1, -1]  # Partagé, mais pas besoin de verrou
+value_array = [-1, -1, -1, -1, -1]  # Partagé
 us_output = -1  # Stocke la médiane calculée
+
+# Création d'un verrou pour synchroniser l'accès aux variables partagées
+value_array_lock = asyncio.Lock()
+us_output_lock = asyncio.Lock()
+
 
 def push_to_data_array(input, array, max_length):
     if len(array) < max_length:
@@ -29,6 +34,7 @@ def push_to_data_array(input, array, max_length):
     else:
         array.pop(0)
         array.append(input)
+
 
 def median_input(array):
     sorted_array = sorted(array)
@@ -39,15 +45,24 @@ def median_input(array):
         median = sorted_array[n // 2]
     return median
 
+
 async def update_distance():
     """Tâche dédiée pour lire les distances et calculer la médiane."""
     global value_array, us_output
     while True:
         distance = Ultra_A.get_distance()
-        push_to_data_array(distance, value_array, 5)
-        us_output = median_input(value_array)  # Calcul de la médiane
+
+        # Utilisation du verrou pour mettre à jour value_array
+        async with value_array_lock:
+            push_to_data_array(distance, value_array, 5)
+            local_value_array = value_array.copy()
+
+        # Calcul de la médiane sous verrou
+        async with us_output_lock:
+            us_output = median_input(local_value_array)
+
         await asyncio.sleep(0.1)  # Lecture toutes les 100ms
-        
+
 async def calibrate():
     """Calibrate the line follower sensor."""
     print("Starting calibration")
@@ -73,7 +88,7 @@ async def calibrate():
     lf.references = references
 
     print("Calibration completed. References:", references)
-
+    
 
 async def send_status(websocket):
     """Envoie les données du suiveur de ligne et de la distance."""
@@ -89,15 +104,19 @@ async def send_status(websocket):
             elapsed_time = time.time() - startTime
             print(f"Elapsed time: {elapsed_time}")
 
+        # Lecture de `us_output` sous verrou
+        async with us_output_lock:
+            local_us_output = us_output
+
         # Logique d'état basée sur `us_output`
-        if us_output > 0:
-            if us_output < 34 and distance_state == 1:
+        if local_us_output > 0:
+            if local_us_output < 34 and distance_state == 1:
                 distance_state = 2
                 print("In state 2")
-            elif us_output < 14 and distance_state == 2:
+            elif local_us_output < 14 and distance_state == 2:
                 distance_state = 3
                 print("In state 3")
-            elif us_output > 28 and distance_state == 3:
+            elif local_us_output > 28 and distance_state == 3:
                 distance_state = 4
                 startTime = time.time()
                 print("First timer started in state 4")
@@ -121,19 +140,21 @@ async def send_status(websocket):
         print(array_message)
         await asyncio.sleep(0.2)  # Pause entre les envois
 
+
 async def echo(websocket, path):
     """Gère les messages entrants et lance `send_status`."""
     asyncio.create_task(send_status(websocket))
     async for message in websocket:
         speed, rotation = process_message(message)
         if speed < 0:
-            bw.speed = speed
+            bw.speed = abs(speed)
             bw.backward()
         else:
             bw.speed = speed
             bw.forward()
         fw.turn(rotation)
         print(f"Speed: {speed}, Rotation: {rotation}")
+
 
 def process_message(json_message):
     try:
@@ -146,9 +167,11 @@ def process_message(json_message):
         print(f"Error processing message: {e}")
         return None
 
+
 def destroy():
     bw.stop()
     fw.turn(90)
+
 
 async def main():
     try:
@@ -160,8 +183,6 @@ async def main():
     except KeyboardInterrupt:
         destroy()
 
-asyncio.run(main())
-
-            
 
 asyncio.run(main())
+
