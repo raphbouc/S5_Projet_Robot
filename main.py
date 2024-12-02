@@ -46,26 +46,28 @@ async def calibrate():
     """Calibrate the line follower sensor."""
     print("Starting calibration")
     references = [0, 0, 0, 0, 0]
-    mount = 100  # Number of measurements for average calculation
+    num_measurements = 5  # Number of measurements to average
 
     # White calibration
     print("Place sensors on white surface...")
     fw.turn(0)
     await asyncio.sleep(4)  # Give some time to place the sensors
-    white_references = lf.get_average(mount)
+    white_values = [lf.get_average(100) for _ in range(num_measurements)]
+    white_references = [sum(values) / num_measurements for values in zip(*white_values)]
 
-    fw.turn(90)
     # Black calibration
     print("Place sensors on black surface...")
+    fw.turn(90)
     await asyncio.sleep(4)  # Give some time to place the sensors
-    black_references = lf.get_average(mount)
+    black_values = [lf.get_average(100) for _ in range(num_measurements)]
+    black_references = [sum(values) / num_measurements for values in zip(*black_values)]
 
     # Calculate middle references
-    for i in range(5):
-        references[i] = (white_references[i] + black_references[i]) / 2
+    references = [(w + b) / 2 for w, b in zip(white_references, black_references)]
     lf.references = references
 
     print("Calibration completed. References:", references)
+
 
 def process_message(json_message):
     try:
