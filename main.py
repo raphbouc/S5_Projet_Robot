@@ -48,7 +48,7 @@ def median_input(array):
 
 async def update_distance():
     """Tâche dédiée pour lire les distances et calculer la médiane."""
-    global value_array, us_output
+    global value_array, us_output, local_value_array
     while True:
         distance = Ultra_A.get_distance()
         print("distance", distance)
@@ -110,13 +110,13 @@ async def send_status(websocket):
 
         # Logique d'état basée sur `us_output`
         if local_us_output > 0:
-            if local_us_output < 34 and distance_state == 1:
+            if median_input(local_value_array) < 34 and distance_state == 1:
                 distance_state = 2
                 print("In state 2")
-            elif local_us_output < 14 and distance_state == 2:
+            elif median_input(local_value_array) < 14 and distance_state == 2:
                 distance_state = 3
                 print("In state 3")
-            elif local_us_output > 28 and distance_state == 3:
+            elif median_input(local_value_array) > 28 and distance_state == 3:
                 distance_state = 4
                 startTime = time.time()
                 elapsed_time = 0
