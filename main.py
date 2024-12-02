@@ -102,6 +102,8 @@ async def send_status(websocket):
         #print(f"value array: {value_array}")
         if distance_state <= 5:
             us_output = median_input(value_array)
+            print("us_output", us_output)
+            print("median complet", value_array)
         else: 
             us_output = -1
         # print(f"output de la mediane: {us_output}")
@@ -116,7 +118,7 @@ async def send_status(websocket):
         elapsed_time = 0
         if startTime != None:
             elapsed_time = time.time() - startTime
-            print(f"elapsed_time right noew is {elapsed_time}")
+            print(f"elapsed_time right now is {elapsed_time}")
 
         if us_output > 0:
             if us_output < 34 and distance_state == 1:
@@ -150,8 +152,6 @@ async def send_status(websocket):
         array_message.append(distance_state)
         await websocket.send(json.dumps(array_message))
         print(array_message)
-        print("us_output", us_output)
-        print("median complet", value_array)
 
         await asyncio.sleep(0.2)  # Wait 100ms before next read
 
