@@ -182,6 +182,11 @@ async def main():
         asyncio.create_task(update_distance())  # Démarre la tâche async
         async with serve(echo, "localhost", 8765):
             await asyncio.Future()  # Garder le serveur actif
+    except Exception as e:
+        print(e)
+        print('error try again in 5')
+        destroy()
+        time.sleep(5)
     except KeyboardInterrupt:
         destroy()
 
