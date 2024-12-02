@@ -51,8 +51,6 @@ async def update_distance():
     global value_array, us_output
     while True:
         distance = Ultra_A.get_distance()
-        if distance != -1:
-            distance = distance -2
         print("distance", distance)
         # Utilisation du verrou pour mettre à jour value_array
         async with value_array_lock:
@@ -112,13 +110,13 @@ async def send_status(websocket):
 
         # Logique d'état basée sur `us_output`
         if local_us_output > 0:
-            if local_us_output < 34 and distance_state == 1:
+            if local_us_output < 33 and distance_state == 1:
                 distance_state = 2
                 print("In state 2")
-            elif local_us_output < 14 and distance_state == 2:
+            elif local_us_output < 13 and distance_state == 2:
                 distance_state = 3
                 print("In state 3")
-            elif local_us_output > 28 and distance_state == 3:
+            elif local_us_output > 27 and distance_state == 3:
                 distance_state = 4
                 startTime = time.time()
                 elapsed_time = 0
