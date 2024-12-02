@@ -19,7 +19,7 @@ fw.ready()
 bw.ready()
 fw.turning_max = 45
 
-value_array = [-1, -1, -1]  # Partagé
+value_array = [-1, -1, -1, -1, -1, -1, -1, -1, -1]  # Partagé
 us_output = -1  # Stocke la médiane calculée
 
 # Création d'un verrou pour synchroniser l'accès aux variables partagées
@@ -54,7 +54,7 @@ async def update_distance():
         print("distance", distance)
         # Utilisation du verrou pour mettre à jour value_array
         async with value_array_lock:
-            push_to_data_array(distance, value_array, 3)
+            push_to_data_array(distance, value_array, 9)
             local_value_array = value_array.copy()
 
         # Calcul de la médiane sous verrou
