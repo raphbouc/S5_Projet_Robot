@@ -150,6 +150,8 @@ async def send_status(websocket):
         array_message.append(distance_state)
         await websocket.send(json.dumps(array_message))
         print(array_message)
+        print("us_output", us_output)
+        print("median complet", value_array)
 
         await asyncio.sleep(0.2)  # Wait 100ms before next read
 
