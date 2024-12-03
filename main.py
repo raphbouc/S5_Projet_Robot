@@ -56,16 +56,14 @@ async def smooth_rotation(newrotation):
                     oldrotation += 1
                     fw.turn(oldrotation)
                     i += 1
-                    time.sleep(0.5)
+                    print("Ici")
         if diff < 0 :
                 while i != diff :
                     oldrotation -= 1
                     fw.turn(oldrotation)
                     i -= 1
-                    time.slee(0.5)
+                    print("Ici 2")
         oldrotation = newrotation
-    print("ICI2 ICI2")
-    print(oldrotation)
 
 
 async def update_distance():
