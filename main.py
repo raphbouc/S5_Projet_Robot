@@ -9,7 +9,7 @@ import json
 import time
 
 lf = LF.Line_Follower()
-REFERENCES = [52.7, 74.7, 68.9, 83.5, 57.8]
+REFERENCES = [106.6, 145.0, 145.0, 151.7, 123.9]
 lf.references = REFERENCES
 Ultra_A = UA.Ultrasonic_Avoidance(20)
 fw = front_wheels.Front_Wheels(db='config')
