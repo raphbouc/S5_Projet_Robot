@@ -142,7 +142,7 @@ async def send_status(websocket):
                 print("In state 4")
             elif distance_state == 18 :
                 twosectime = time.time()
-                distance_state == 19
+                distance_state = 19
             elif distance_state == 19 : 
                 if (twosectime > 2):
                     distance_state == 4
