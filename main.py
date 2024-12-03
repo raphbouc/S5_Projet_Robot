@@ -46,28 +46,6 @@ def median_input(array):
     return median
 
 
-async def smooth_rotation(newrotation):
-    global oldrotation
-    if newrotation != oldrotation:
-        diff = newrotation - oldrotation
-        i = 0
-        if diff > 0 :
-                while i == diff :
-                    oldrotation += 1
-                    fw.turn(oldrotation)
-                    i += 1
-                    time.sleep(0.5)
-        if diff < 0 :
-                while i == diff :
-                    oldrotation -= 1
-                    fw.turn(oldrotation)
-                    i -= 1
-                    time.slee(0.5)
-        oldrotation = newrotation
-    print("ICI2 ICI2")
-    print(oldrotation)
-
-
 async def update_distance():
     """Tâche dédiée pour lire les distances et calculer la médiane."""
     global value_array, us_output
@@ -178,7 +156,22 @@ async def echo(websocket, path):
         else:
             bw.speed = speed
             bw.forward()
-        await smooth_rotation(rotation)
+        if rotation != oldrotation:
+            diff = rotation - oldrotation
+            i = 0
+            if diff > 0 :
+                    while i == diff :
+                        oldrotation += 1
+                        fw.turn(oldrotation)
+                        i += 1
+                        time.sleep(0.5)
+            if diff < 0 :
+                    while i == diff :
+                        oldrotation -= 1
+                        fw.turn(oldrotation)
+                        i -= 1
+                        time.slee(0.5)
+            oldrotation = rotation
         print(f"Speed: {speed}, Rotation: {rotation}")
 
 
