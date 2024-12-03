@@ -60,6 +60,8 @@ async def smooth_rotation(newrotation):
             for _ in diff :
                 oldrotation -= 1
                 fw.turn(oldrotation)
+                oldrotation = newrotation
+    print("ICI2 ICI2")
 
 
 async def update_distance():
@@ -162,7 +164,6 @@ async def send_status(websocket):
 
 
 async def echo(websocket, path):
-    global oldrotation
     """Gère les messages entrants et lance `send_status`."""
     asyncio.create_task(send_status(websocket))
     async for message in websocket:
@@ -174,7 +175,6 @@ async def echo(websocket, path):
             bw.speed = speed
             bw.forward()
         smooth_rotation(rotation)
-        oldrotation = rotation
         print(f"Speed: {speed}, Rotation: {rotation}")
 
 
