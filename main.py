@@ -56,13 +56,13 @@ async def smooth_rotation(newrotation):
                     oldrotation += 1
                     fw.turn(oldrotation)
                     i += 1
-                    print("Ici")
+                    time.sleep(0.0005)
         if diff < 0 :
                 while i != diff :
                     oldrotation -= 1
                     fw.turn(oldrotation)
                     i -= 1
-                    print("Ici 2")
+                    time.sleep(0.0005)
         oldrotation = newrotation
 
 
