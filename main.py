@@ -50,17 +50,18 @@ async def smooth_rotation(newrotation):
     global oldrotation
     if newrotation != oldrotation:
         diff = newrotation - oldrotation
-
+        i = 0
         if diff > 0 :
-            for _ in diff :
-                oldrotation += 1
-                fw.turn(oldrotation)
-                print("ICI")
+                while i == diff :
+                    oldrotation += 1
+                    fw.turn(oldrotation)
+                    i += 1
         if diff < 0 :
-            for _ in diff :
-                oldrotation -= 1
-                fw.turn(oldrotation)
-                oldrotation = newrotation
+                while i == diff :
+                    oldrotation -= 1
+                    fw.turn(oldrotation)
+                    i -= 1
+        oldrotation = newrotation
     print("ICI2 ICI2")
 
 
