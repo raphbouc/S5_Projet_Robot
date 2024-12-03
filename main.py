@@ -21,7 +21,7 @@ fw.turning_max = 45
 
 value_array = [-1, -1, -1, -1 , -1]  # Partagé
 us_output = -1  # Stocke la médiane calculée
-
+oldrotation = 90
 # Création d'un verrou pour synchroniser l'accès aux variables partagées
 value_array_lock = asyncio.Lock()
 us_output_lock = asyncio.Lock()
@@ -44,6 +44,26 @@ def median_input(array):
     else:  # Si impair
         median = sorted_array[n // 2]
     return median
+
+
+async def smooth_rotation(newrotation):
+    global oldrotation
+    if newrotation != oldrotation:
+        diff = newrotation - oldrotation
+        i = 0
+        if diff > 0 :
+                while i != diff :
+                    oldrotation += 1
+                    fw.turn(oldrotation)
+                    i += 1
+                    time.sleep(0.003)
+        if diff < 0 :
+                while i != diff :
+                    oldrotation -= 1
+                    fw.turn(oldrotation)
+                    i -= 1
+                    time.sleep(0.003)
+        oldrotation = newrotation
 
 
 async def update_distance():
@@ -162,7 +182,7 @@ async def echo(websocket, path):
         else:
             bw.speed = speed
             bw.forward()
-        fw.turn(rotation)
+        await smooth_rotation(rotation)
         print(f"Speed: {speed}, Rotation: {rotation}")
 
 
