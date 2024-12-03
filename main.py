@@ -9,7 +9,7 @@ import json
 import time
 
 lf = LF.Line_Follower()
-REFERENCES = [52.7, 74.7, 68.9, 83.5, 57.8]
+REFERENCES = [106.6, 145.0, 145.0, 151.7, 123.9]
 lf.references = REFERENCES
 Ultra_A = UA.Ultrasonic_Avoidance(20)
 fw = front_wheels.Front_Wheels(db='config')
@@ -114,28 +114,34 @@ async def send_status(websocket):
             if local_us_output < 33 and distance_state == 1:
                 distance_state = 2
                 print("In state 2")
-            elif local_us_output < 13 and distance_state == 2:
+            elif local_us_output < 18 and distance_state == 2:
                 distance_state = 3
-                print("In state 3")
-            elif local_us_output > 27 and distance_state == 3:
+                print("in state 3")
+            elif local_us_output < 13 and distance_state == 3:
                 distance_state = 4
+                print("In state 4")
+            elif local_us_output > 23 and distance_state == 4:
+                distance_state = 5
+                print("in state 5")
+            elif local_us_output > 27 and distance_state == 5:
+                distance_state = 6
                 startTime = time.time()
                 elapsed_time = 0
-                print("First timer started in state 4")
-        if elapsed_time > 4.25 and distance_state == 4:
-            distance_state = 5
-            elapsed_time = 0
-            startTime = time.time()
-            print("Second timer started in state 5")
-        elif elapsed_time > 3 and distance_state == 5:
-            distance_state = 6
-            elapsed_time = 0
-            startTime = time.time()
-            print("In state 6")
-        elif elapsed_time > 2 and distance_state == 6:
+                print("First timer started in state 6")
+        if elapsed_time > 3.2 and distance_state == 6:
             distance_state = 7
-            print("In state 7")
-        elif sum(lt_status_now) >= 1 and distance_state == 7:
+            elapsed_time = 0
+            startTime = time.time()
+            print("Second timer started in state 7")
+        elif elapsed_time > 2.25 and distance_state == 7:
+            distance_state = 8
+            elapsed_time = 0
+            startTime = time.time()
+            print("In state 8")
+        elif elapsed_time > 1.1 and distance_state == 8:
+            distance_state = 9
+            print("In state 9")
+        elif sum(lt_status_now) >= 1 and distance_state == 9:
             distance_state = 1
             value_array = [-1, -1, -1, -1, -1]
             print("Back to state 1")
