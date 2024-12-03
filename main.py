@@ -65,6 +65,7 @@ async def smooth_rotation(newrotation):
                     time.slee(0.005)
         oldrotation = newrotation
     print("ICI2 ICI2")
+    print(oldrotation)
 
 
 async def update_distance():
