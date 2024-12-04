@@ -23,7 +23,7 @@ value_array = [-1, -1, -1, -1 , -1]  # Partagé
 us_output = -1  # Stocke la médiane calculée
 oldrotation = 90
 sleepyjoe = 0
-recent_outputs = [-1, -1] # Création d'un verrou pour synchroniser l'accès aux variables partagées
+recent_outputs = [-1, -1, -1, -1] # Création d'un verrou pour synchroniser l'accès aux variables partagées
 value_array_lock = asyncio.Lock()
 us_output_lock = asyncio.Lock()
 
@@ -177,6 +177,7 @@ async def send_status(websocket):
         elif sum(lt_status_now) >= 1 and distance_state == 9:
             distance_state = 1
             sleepyjoe = 0
+            recent_outputs = [-1, -1, -1, -1]
             value_array = [-1, -1, -1, -1, -1]
             print("Back to state 1")
 
