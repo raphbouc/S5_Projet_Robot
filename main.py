@@ -22,6 +22,7 @@ fw.turning_max = 45
 value_array = [-1, -1, -1, -1 , -1]  # Partagé
 us_output = -1  # Stocke la médiane calculée
 oldrotation = 90
+sleepyjoe = 0
 # Création d'un verrou pour synchroniser l'accès aux variables partagées
 value_array_lock = asyncio.Lock()
 us_output_lock = asyncio.Lock()
@@ -113,7 +114,7 @@ async def calibrate():
 
 async def send_status(websocket):
     """Envoie les données du suiveur de ligne et de la distance."""
-    global us_output, value_array
+    global us_output, value_array, sleepyjoe
     distance_state = 1
     startTime = None
     while True:
@@ -125,6 +126,9 @@ async def send_status(websocket):
             elapsed_time = time.time() - startTime
             print(f"Elapsed time: {elapsed_time}")
 
+        if sleepyjoe:
+            sleepyjoe_elapsed_time = time.time() - sleepyjoe
+            print("Sleepy joe elapsed time", sleepyjoe_elapsed_time)
         # Lecture de `us_output` sous verrou
         async with us_output_lock:
             local_us_output = us_output
@@ -138,6 +142,11 @@ async def send_status(websocket):
                 distance_state = 3
                 print("in state 3")
             elif local_us_output < 13 and distance_state == 3:
+                distance_state = 10
+                sleepyjoe = time.time()
+                sleepyjoe_elapsed_time = 0
+                print("In state 10")
+            elif distance_state == 10 and sleepyjoe_elapsed_time > 2:
                 distance_state = 4
                 print("In state 4")
             elif local_us_output > 23 and distance_state == 4:
@@ -163,6 +172,7 @@ async def send_status(websocket):
             print("In state 9")
         elif sum(lt_status_now) >= 1 and distance_state == 9:
             distance_state = 1
+            sleepyjoe = 0
             value_array = [-1, -1, -1, -1, -1]
             print("Back to state 1")
 
