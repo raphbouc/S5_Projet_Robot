@@ -23,8 +23,7 @@ value_array = [-1, -1, -1, -1 , -1]  # Partagé
 us_output = -1  # Stocke la médiane calculée
 oldrotation = 90
 sleepyjoe = 0
-low_value_count = 0  # Initialisez le compteur global
-# Création d'un verrou pour synchroniser l'accès aux variables partagées
+recent_outputs = [-1, -1] # Création d'un verrou pour synchroniser l'accès aux variables partagées
 value_array_lock = asyncio.Lock()
 us_output_lock = asyncio.Lock()
 
@@ -73,7 +72,6 @@ async def update_distance():
     global value_array, us_output
     while True:
         distance = Ultra_A.get_distance()
-        print("distance", distance)
         # Utilisation du verrou pour mettre à jour value_array
         async with value_array_lock:
             if distance != -1:
@@ -136,14 +134,13 @@ async def send_status(websocket):
 
         # Logique d'état basée sur `us_output`
         if local_us_output > 0:
-            if local_us_output < 33:
-                low_value_count += 1  # Incrémentez le compteur
-            else:
-                low_value_count = 0  # Réinitialisez si la condition n'est pas remplie
+           # Mettez à jour la liste des valeurs récentes
+            recent_outputs.pop(0)
+            recent_outputs.append(local_us_output)
 
-            if low_value_count >= 2 and distance_state == 1:
+            # Vérifiez si les deux dernières valeurs sont inférieures à 33
+            if all(output < 33 for output in recent_outputs) and distance_state == 1:
                 distance_state = 2
-                low_value_count = 0  # Réinitialisez le compteur après le changement d'état
                 print("In state 2")
             elif local_us_output < 18 and distance_state == 2:
                 distance_state = 3
