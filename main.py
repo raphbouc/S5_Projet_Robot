@@ -113,7 +113,7 @@ async def calibrate():
 
 async def send_status(websocket):
     """Envoie les données du suiveur de ligne et de la distance."""
-    global us_output, value_array, sleepyjoe
+    global us_output, value_array, sleepyjoe, recent_outputs
     distance_state = 1
     startTime = None
     while True:
