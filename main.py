@@ -22,6 +22,7 @@ fw.turning_max = 45
 value_array = [-1, -1, -1, -1 , -1]  # Partagé
 us_output = -1  # Stocke la médiane calculée
 oldrotation = 90
+sleepyjoe = 0
 # Création d'un verrou pour synchroniser l'accès aux variables partagées
 value_array_lock = asyncio.Lock()
 us_output_lock = asyncio.Lock()
@@ -113,7 +114,7 @@ async def calibrate():
 
 async def send_status(websocket):
     """Envoie les données du suiveur de ligne et de la distance."""
-    global us_output, value_array
+    global us_output, value_array, sleepyjoe
     distance_state = 1
     startTime = None
     while True:
