@@ -192,7 +192,7 @@ async def echo(websocket, path):
         else:
             bw.speed = speed
             bw.forward()
-        fw.turn(rotation)
+        await smooth_rotation(rotation)
         print(f"Speed: {speed}, Rotation: {rotation}")
 
 
