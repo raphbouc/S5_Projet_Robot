@@ -23,6 +23,7 @@ value_array = [-1, -1, -1, -1 , -1]  # Partagé
 us_output = -1  # Stocke la médiane calculée
 oldrotation = 90
 sleepyjoe = 0
+low_value_count = 0  # Initialisez le compteur global
 # Création d'un verrou pour synchroniser l'accès aux variables partagées
 value_array_lock = asyncio.Lock()
 us_output_lock = asyncio.Lock()
@@ -135,8 +136,14 @@ async def send_status(websocket):
 
         # Logique d'état basée sur `us_output`
         if local_us_output > 0:
-            if local_us_output < 33 and distance_state == 1:
+            if local_us_output < 33:
+                low_value_count += 1  # Incrémentez le compteur
+            else:
+                low_value_count = 0  # Réinitialisez si la condition n'est pas remplie
+
+            if low_value_count >= 2 and distance_state == 1:
                 distance_state = 2
+                low_value_count = 0  # Réinitialisez le compteur après le changement d'état
                 print("In state 2")
             elif local_us_output < 18 and distance_state == 2:
                 distance_state = 3
