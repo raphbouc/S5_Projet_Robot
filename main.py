@@ -200,8 +200,8 @@ def process_message(json_message):
     try:
         data = json.loads(json_message)
         speed = int(float(data.get("speed", 0)) * 300)
-        rotation = int(float(data.get("rotation", 0)) + 95)
-        rotation = max(50, min(rotation, 140))
+        rotation = int(float(data.get("rotation", 0)) + 85)
+        rotation = max(40, min(rotation, 130))
         return speed, rotation
     except Exception as e:
         print(f"Error processing message: {e}")
