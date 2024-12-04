@@ -9,7 +9,7 @@ import json
 import time
 
 lf = LF.Line_Follower()
-REFERENCES = [106.6, 145.0, 145.0, 151.7, 123.9]
+REFERENCES = [49.3, 79.0, 74.5, 81.7, 57.4]
 lf.references = REFERENCES
 Ultra_A = UA.Ultrasonic_Avoidance(20)
 fw = front_wheels.Front_Wheels(db='config')
@@ -157,7 +157,7 @@ async def send_status(websocket):
                 startTime = time.time()
                 elapsed_time = 0
                 print("First timer started in state 6")
-        if elapsed_time > 3.2 and distance_state == 6:
+        if elapsed_time > 3.35 and distance_state == 6:
             distance_state = 7
             elapsed_time = 0
             startTime = time.time()
