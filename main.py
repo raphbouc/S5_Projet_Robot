@@ -23,7 +23,8 @@ value_array = [-1, -1, -1, -1 , -1]  # Partagé
 us_output = -1  # Stocke la médiane calculée
 oldrotation = 90
 sleepyjoe = 0
-recent_outputs = [-1, -1, -1, -1] # Création d'un verrou pour synchroniser l'accès aux variables partagées
+low_value_count = 0  # Initialisez le compteur global
+# Création d'un verrou pour synchroniser l'accès aux variables partagées
 value_array_lock = asyncio.Lock()
 us_output_lock = asyncio.Lock()
 
@@ -113,7 +114,7 @@ async def calibrate():
 
 async def send_status(websocket):
     """Envoie les données du suiveur de ligne et de la distance."""
-    global us_output, value_array, sleepyjoe, recent_outputs
+    global us_output, value_array, sleepyjoe
     distance_state = 1
     startTime = None
     while True:
@@ -134,12 +135,7 @@ async def send_status(websocket):
 
         # Logique d'état basée sur `us_output`
         if local_us_output > 0:
-           # Mettez à jour la liste des valeurs récentes
-            recent_outputs.pop(0)
-            recent_outputs.append(local_us_output)
-
-            # Vérifiez si les deux dernières valeurs sont inférieures à 33
-            if all(output < 23 for output in recent_outputs) and distance_state == 1:
+            if local_us_output < 23 and distance_state == 1:
                 distance_state = 2
                 print("In state 2")
             elif local_us_output < 18 and distance_state == 2:
@@ -177,7 +173,6 @@ async def send_status(websocket):
         elif sum(lt_status_now) >= 1 and distance_state == 9:
             distance_state = 1
             sleepyjoe = 0
-            recent_outputs = [-1, -1, -1, -1]
             value_array = [-1, -1, -1, -1, -1]
             print("Back to state 1")
 
