@@ -139,7 +139,7 @@ async def send_status(websocket):
             recent_outputs.append(local_us_output)
 
             # Vérifiez si les deux dernières valeurs sont inférieures à 33
-            if all(output < 33 for output in recent_outputs) and distance_state == 1:
+            if all(output < 23 for output in recent_outputs) and distance_state == 1:
                 distance_state = 2
                 print("In state 2")
             elif local_us_output < 18 and distance_state == 2:
