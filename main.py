@@ -157,12 +157,12 @@ async def send_status(websocket):
                 startTime = time.time()
                 elapsed_time = 0
                 print("First timer started in state 6")
-        if elapsed_time > 3.325 and distance_state == 6:
+        if elapsed_time > 3.335 and distance_state == 6:
             distance_state = 7
             elapsed_time = 0
             startTime = time.time()
             print("Second timer started in state 7")
-        elif elapsed_time > 2.2 and distance_state == 7:
+        elif elapsed_time > 2.3 and distance_state == 7:
             distance_state = 8
             elapsed_time = 0
             startTime = time.time()
