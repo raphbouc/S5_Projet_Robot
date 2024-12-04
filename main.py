@@ -126,7 +126,9 @@ async def send_status(websocket):
             elapsed_time = time.time() - startTime
             print(f"Elapsed time: {elapsed_time}")
 
-        print("Sleepy joe", sleepyjoe)
+        if sleepyjoe:
+            sleepyjoe_elapsed_time = time.time() - sleepyjoe
+            print("Sleepy joe elapsed time", sleepyjoe_elapsed_time)
         # Lecture de `us_output` sous verrou
         async with us_output_lock:
             local_us_output = us_output
@@ -142,8 +144,9 @@ async def send_status(websocket):
             elif local_us_output < 13 and distance_state == 3:
                 distance_state = 10
                 sleepyjoe = time.time()
+                sleepyjoe_elapsed_time = 0
                 print("In state 10")
-            elif distance_state == 10 and sleepyjoe > 2:
+            elif distance_state == 10 and sleepyjoe_elapsed_time > 2:
                 distance_state = 4
                 print("In state 4")
             elif local_us_output > 23 and distance_state == 4:
