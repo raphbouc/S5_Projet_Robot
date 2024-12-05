@@ -146,7 +146,7 @@ async def send_status(websocket):
                 sleepyjoe = time.time()
                 sleepyjoe_elapsed_time = 0
                 print("In state 10")
-            elif distance_state == 10 and sleepyjoe_elapsed_time > 2:
+            elif distance_state == 10 and sleepyjoe_elapsed_time > 1.25:
                 distance_state = 4
                 print("In state 4")
             elif local_us_output > 23 and distance_state == 4:
